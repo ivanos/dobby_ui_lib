@@ -84,7 +84,13 @@ var ColumnView = React.createClass({
         var items = this.state.items,
             identifier = items[itemIndex].identifiers[identifierIndex],
             newItems = items.slice(0, itemIndex + 1),
-            selected = this.state.selected.slice(0, itemIndex);
+            selected = this.state.selected.slice(0, itemIndex + 1);
+
+        var selectedIdentifiers = new Set(newItems.map(({identifier}) => identifier));
+
+        if (selectedIdentifiers.has(identifier)) {
+            return;
+        }
 
         selected[itemIndex] = identifierIndex;
 
