@@ -1,168 +1,6 @@
-
-var Metadata = React.createClass({
-    render () {
-        return (
-            <div className={"column-metadata"}
-                 dangerouslySetInnerHTML={{__html: this.props.item ? this.props.item.metadata.display() : "Not selected"}}>
-            </div>
-        )
-    }
-});
-
-var List = React.createClass({
-
-    getInitialState() {
-        return {
-            scrollTop: 0
-        }
-    },
-
-    setScrollPosition({scrollTop}) {
-        this.setState({
-            scrollTop
-        });
-    },
-
-    shouldComponentUpdate(_, newState) {
-        if (this.state.scrollTop !== newState.scrollTop) {
-            this.getDOMNode().scrollTop = newState.scrollTop;
-
-            return false;
-        }
-        return true;
-    },
-
-    render() {
-
-        return (
-            <div className={"column-list-wrapper"} scrollTop={this.state.scrollTop} onScroll={this.props.onScroll}>
-                <ul className={"column-list"}>
-                    {this.props.items.map((item, index) => {
-                        var classes = [];
-
-                        if (this.props.hovered === index) {
-                            classes.push("hovered");
-                        }
-
-                        if (this.props.selected === index) {
-                            classes.push("selected");
-                        }
-
-                        return <li key={index} className={classes.join(" ")}
-                                   onClick={() => this.props.onSelect(index)}
-                                   onMouseEnter={() => this.props.onHover(index)}
-                                   onMouseLeave={() => this.props.onHover(ROW_NOT_EXIST)}
-                                >{this.props.renderItem(item)}</li>
-                    }, this)}
-                </ul>
-            </div>
-        )
-    }
-});
-
-const ROW_NOT_EXIST = -1;
-
-var Column = React.createClass({
-
-    getDefaultProps() {
-        return {
-            items: [],
-            renderItem: (item) => item
-        }
-    },
-
-    getInitialState() {
-        return {
-            selectedRowIndex: ROW_NOT_EXIST,
-            hoveredRowIndex: ROW_NOT_EXIST
-        }
-    },
-
-    setHoveredRow(index=ROW_NOT_EXIST) {
-        this.setState({
-            hoveredRowIndex: index
-        })
-    },
-
-    setSelectedRow(index=ROW_NOT_EXIST) {
-        this.setState({
-            selectedRowIndex: index
-        })
-    },
-
-    setScrollPosition({scrollTop}) {
-        this.refs.list.setScrollPosition({scrollTop});
-    },
-
-    _getMetadataIndex() {
-        return this.state.hoveredRowIndex !== ROW_NOT_EXIST ? this.state.hoveredRowIndex : this.state.selectedRowIndex;
-    },
-
-    render() {
-        return (
-            <div className={["column-wrapper", this.props.className].join(" ")}>
-                <Metadata
-                    item={this.props.items[this._getMetadataIndex()]}
-                    />
-                <List
-                    ref="list"
-                    onScroll={this.props.onScroll}
-                    items={this.props.items}
-                    selected={this.state.selectedRowIndex}
-                    hovered={this.state.hoveredRowIndex}
-                    onHover={this.props.onHover}
-                    onSelect={this.props.onSelect}
-                    renderItem={this.props.renderItem}
-                />
-            </div>
-        )
-    }
-});
-
-var ColumnPairView = React.createClass({
-
-    _onSelect(index) {
-        this.refs.identifiers.setSelectedRow(index);
-        this.refs.links.setSelectedRow(index);
-
-        this.props.onSelect(index);
-    },
-
-    _onHover(index) {
-        this.refs.identifiers.setHoveredRow(index);
-        this.refs.links.setHoveredRow(index);
-    },
-
-    _onScroll(event) {
-        var scrollTop = event.target.scrollTop;
-        this.refs.identifiers.setScrollPosition({scrollTop});
-        this.refs.links.setScrollPosition({scrollTop});
-    },
-
-    render() {
-        return (
-            <div className={this.props.className} style={{display: "flex"}}>
-                <Column
-                    ref="links"
-                    onScroll={(e) => this._onScroll(e)}
-                    items={this.props.links}
-                    onSelect={(index) => this._onSelect(index)}
-                    onHover={(index) => this._onHover(index)}
-                    renderItem={(item) => item.metadata.get("type")}
-                    />
-                <Column
-                    ref="identifiers"
-                    className="column-identifiers"
-                    onScroll={(e) => this._onScroll(e)}
-                    items={this.props.identifiers}
-                    onSelect={(index) => this._onSelect(index)}
-                    onHover={(index) => this._onHover(index)}
-                    renderItem={(item) => item.name}
-                />
-            </div>
-        )
-    }
-});
+import {ROW_NOT_EXIST} from "./constants";
+import Column from "./Column";
+import ColumnPairView from "./ColumnPairView";
 
 var BreadCrumbs = React.createClass({
     render() {
@@ -178,7 +16,9 @@ var ColumnView = React.createClass({
 
     getInitialState() {
         return {
-            items: []
+            items: [],
+            hovered: [],
+            selected: []
         }
     },
 
@@ -217,10 +57,15 @@ var ColumnView = React.createClass({
     },
 
     _rootColumnSelect() {
-        this.refs.rootIdentifier.setSelectedRow(0);
+        // TODO: rework component do we could use _handleIdentifierSelect(0,0);
+        //this._handleIdentifierSelect(0, 0);
         this.search(this.props.identifier)
             .then((result) => {
-                this.setState({items: [result]});
+                this.setState({
+                    items: [result],
+                    selected: [],
+                    hovered: []
+                });
             });
     },
 
@@ -238,17 +83,27 @@ var ColumnView = React.createClass({
     _handleIdentifierSelect(itemIndex, identifierIndex) {
         var items = this.state.items,
             identifier = items[itemIndex].identifiers[identifierIndex],
-            newItems = items.slice(0, itemIndex + 1);
+            newItems = items.slice(0, itemIndex + 1),
+            selected = this.state.selected.slice(0, itemIndex);
+
+        selected[itemIndex] = identifierIndex;
 
         this.search(identifier)
             .then((result) => {
                 newItems.push(result);
                 this.setState({
-                    items: newItems
+                    items: newItems,
+                    selected
                 });
                 this.props.onAppend();
             });
 
+    },
+
+    _handleIdentifierHover(itemIndex, identifierIndex) {
+        var hovered = this.state.hovered;
+        hovered[itemIndex] = identifierIndex;
+        this.setState({hovered});
     },
 
     render() {
@@ -257,6 +112,7 @@ var ColumnView = React.createClass({
                 <div className={"column-view" + (this.state.items.length === 1 ? " last-column" : "")}>
                     <Column
                         ref="rootIdentifier"
+                        selected={0}
                         className="column-identifiers root-identifier"
                         items={[this.props.identifier]}
                         onSelect={() => this._rootColumnSelect()}
@@ -268,6 +124,9 @@ var ColumnView = React.createClass({
                             className={index === items.length - 2 ? "last-column" : ""}
                             key={identifier.name + index}
                             identifiers={identifiers}
+                            onHover={(identifierIndex) => this._handleIdentifierHover(index, identifierIndex)}
+                            selected={this.state.selected[index]}
+                            hovered={this.state.hovered[index]}
                             links={links}
                             onSelect={(identifierIndex) =>
                                 this._handleIdentifierSelect(index, identifierIndex)}
