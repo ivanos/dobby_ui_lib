@@ -28,7 +28,7 @@ var List = React.createClass({
         return (
             <div className={"column-list-wrapper"} onScroll={this.props.onScroll}>
                 <ul className={"column-list"}>
-                    {this.props.items.map((item, index) => {
+                    {this.props.items.map((item, index, items) => {
                         var classes = [];
 
                         if (this.props.hovered === index) {
@@ -43,7 +43,7 @@ var List = React.createClass({
                                    onClick={() => this.props.onSelect(index)}
                                    onMouseEnter={() => this.props.onHover(index)}
                                    onMouseLeave={() => this.props.onHover(ROW_NOT_EXIST)}
-                            >{this.props.renderItem(item)}</li>
+                            >{this.props.renderItem(item, index, items)}</li>
                     }, this)}
                 </ul>
             </div>
