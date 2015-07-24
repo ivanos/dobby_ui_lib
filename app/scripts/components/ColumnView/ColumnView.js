@@ -1,51 +1,12 @@
-import {ROW_NOT_EXIST} from "./constants";
-import Column from "./Column";
-import ColumnPairView from "./ColumnPairView";
-
-var BreadCrumbs = React.createClass({
-    render() {
-        return (
-            <div className={"list-view-breadcrumbs"}>
-                {this.props.items.map((item, index, items) => {
-                    return (
-                        <div>
-                            <span
-                                onClick={() => this.props.onSelect(index)}
-                                onMouseOver={() => this.props.onHover(index)}
-                                onMouseOut={() => this.props.onHover(ROW_NOT_EXIST)}
-                                style={{backgroundColor: this.props.hovered == index ? "red" : null}}
-                            >
-                                {item.name}
-                            </span>
-                            {(index !== items.length - 1) ? <Separator /> : null}
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    }
-});
-
-var Separator = React.createClass({
-    render() {
-        return <span>|</span>
-    }
-});
+import LinkIdentifierColumn from "./LinkIdentifierColumn";
+import BreadCrumbs from "./BreadCrumbs";
+import IdentifierColumn from "./IdentifierColumn";
 
 var ColumnView = React.createClass({
 
     getInitialState() {
         return {
             items: [],
-            hovered: [],
-            hoveredBreadcrumb: [ROW_NOT_EXIST],
-            selected: []
-        }
-    },
-
-    getDefaultProps() {
-        return {
-            onAppend: () => {}
         }
     },
 
@@ -77,118 +38,69 @@ var ColumnView = React.createClass({
         }
     },
 
-    _rootColumnSelect() {
-        // TODO: rework component do we could use _handleIdentifierSelect(0,0);
-        //this._handleIdentifierSelect(0, 0);
-        this.search(this.props.identifier)
-            .then((result) => {
-                this.setState({
-                    items: [result],
-                    selected: [],
-                    hovered: []
-                });
-            });
+    _mapResults({identifier, identifiers, links}) {
+        var neighbours = identifiers.map((identifier, index) => {
+            return {identifier, link: links[index]}
+        });
+
+        return {identifier, neighbours};
     },
 
     componentDidMount() {
-        this._rootColumnSelect();
+        this._identifierSelect(this.props.identifier);
+        this.refs.root.select(this.props.identifier);
     },
 
     search(identifier) {
         return identifier.search({})
             .then(this._removeIdentifierFromResult(identifier))
             .then(({identifiers, links}) => {return {identifier, identifiers, links}})
-            .then(this._sortResults);
+            .then(this._sortResults)
+            .then(this._mapResults);
     },
 
-    _handleIdentifierSelect(itemIndex, identifierIndex = ROW_NOT_EXIST) {
-        var items = this.state.items,
-            identifier = items[itemIndex].identifiers[identifierIndex] || items[itemIndex].identifier,
-            newItems = items.slice(0, itemIndex + 1),
-            selected = this.state.selected.slice(0, itemIndex + 1);
-
-        var selectedIdentifiers = new Set(newItems.map(({identifier}) => identifier));
-
-        if (selectedIdentifiers.has(identifier)) {
-            return;
-        }
-
-        selected[itemIndex] = identifierIndex;
-
+    _identifierSelect(identifier, index=0) {
+        var items = this.state.items.slice(0, index);
         this.search(identifier)
-            .then((result) => {
-                newItems.push(result);
-                this.setState({
-                    items: newItems,
-                    selected
-                });
-
-                var $view = $(React.findDOMNode(this.refs.scroll));
-                $view.animate({scrollLeft: $view.prop("scrollWidth")}, 500)
+            .then((results) => {
+                items.push(results);
+                this.setState({items})
             });
-
-    },
-
-    _handleIdentifierHover(itemIndex, identifierIndex) {
-        var hovered = this.state.hovered,
-            hoveredIdentifier = this.state.items[itemIndex].identifiers[identifierIndex],
-            hoveredBreadcrumb = ROW_NOT_EXIST;
-
-            this.state.items.forEach(({identifier}, index) => {
-                if (identifier === hoveredIdentifier) {
-                    hoveredBreadcrumb = index;
-                    return false;
-                }
-            });
-
-        hovered[itemIndex] = identifierIndex;
-        this.setState({
-            hovered,
-            hoveredBreadcrumb
-        });
-    },
-
-    _breadcrumbSelect(index) {
-        var items = this.state.items.slice(0, index + 1),
-            selected = this.state.selected.slice(0, index);
-
-        this.setState({items, selected});
     },
 
     render() {
+        var columns = this.state.items.map((item, index, items) => {
+            return (
+                <LinkIdentifierColumn
+                    className={index === items.length - 2 ? "last-column" : ""}
+                    disabledItems={new Set(items.slice(0, index + 1).map(({identifier}) => identifier))}
+                    key={item.identifier.name}
+                    items={item.neighbours}
+                    onSelect={({identifier}) => this._identifierSelect(identifier, index + 1)}
+                    onHover={(item={identifier: undefined}) => {this.refs.breadcrumbs.hover(item.identifier)}}
+                />
+            )
+        });
+
         return (
-            <div style={{flex: 1, display: "flex", flexDirection: "column"}}>
-                <div ref="scroll" className={"column-view-wrapper"}>
-                    <div className={"column-view" + (this.state.items.length === 1 ? " last-column" : "")}>
-                        <Column
-                            ref="rootIdentifier"
-                            selected={0}
-                            className="column-identifiers root-identifier"
-                            items={[this.props.identifier]}
-                            onSelect={() => this._rootColumnSelect()}
-                            onHover={() => {}}
-                            renderItem={(item) => item.name}
-                        />
-                        {this.state.items.map(({identifier, identifiers, links}, index, items) => {
-                            return <ColumnPairView
-                                className={index === items.length - 2 ? "last-column" : ""}
-                                key={identifier.name + index}
-                                identifiers={identifiers}
-                                onHover={(identifierIndex) => this._handleIdentifierHover(index, identifierIndex)}
-                                selected={this.state.selected[index]}
-                                hovered={this.state.hovered[index]}
-                                links={links}
-                                onSelect={(identifierIndex) =>
-                                    this._handleIdentifierSelect(index, identifierIndex)}
-                            />
-                        })}
-                    </div>
+            <div className="column-list" style={{flex: 1, display: "flex", flexDirection: "column"}}>
+                <div style={{flex: 1, display: "flex", flexDirection: "row", overflowX: "auto", overflowY: "hidden"}}>
+                    <IdentifierColumn
+                        ref="root"
+                        className={this.state.items.length === 1 ? " last-column" : ""}
+                        items={[this.props.identifier]}
+                        onSelect={(identifier) => {this._identifierSelect(identifier)}}
+                        onHover={(identifier) => {this.refs.breadcrumbs.hover(identifier)}}
+                    />
+                    {columns}
                 </div>
                 <BreadCrumbs
+                    ref="breadcrumbs"
                     items={this.state.items.map(({identifier}) => identifier)}
-                    hovered={this.state.hoveredBreadcrumb}
-                    onHover={(hoveredBreadcrumb) => {this.setState({hoveredBreadcrumb})}}
-                    onSelect={(index) => {this._breadcrumbSelect(index)}}
+                    onSelect={(identifier, index) => {
+                        this._identifierSelect(identifier, index);
+                        this.refs.breadcrumbs.select();
+                    }}
                 />
             </div>
         )
