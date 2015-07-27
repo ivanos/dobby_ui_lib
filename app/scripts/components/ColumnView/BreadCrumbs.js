@@ -1,4 +1,6 @@
 import mouseEventsMixin from "./mouseEventsMixin";
+import List from "./List";
+import Identifier from "./Identifier";
 
 var Separator = React.createClass({
     render() {
@@ -12,17 +14,21 @@ var BreadCrumbs = React.createClass({
 
     render() {
         return (
-            <div className={"list-view-breadcrumbs"}>
-                {this.props.items.map((...args) => {
+            <List
+                className={"breadcrumbs-list"}
+                items={this.props.items}
+                renderItem={(...args) => {
                     var [item, index, items] = args;
+
+                    var className = [this.getClassName(item), "breadcrumb"].join(" ");
+
                     return (
-                        <div key={index}>
-                            <div className={this.getClassName(item)} {...this.getMouseHandlers(...args)}>{item.name}</div>
-                            {(index !== items.length - 1) ? <Separator /> : null}
+                        <div className="breadcrumb-container">
+                            <Identifier identifier={item} className={className} {...this.getMouseHandlers(...args)} />
                         </div>
                     );
-                })}
-            </div>
+                }}
+            />
         );
     }
 });

@@ -7,27 +7,23 @@ var IdentifierColumn = React.createClass({
 
     mixins: [mouseEventsMixin],
 
-    getInitialState() {
-        return {
-            items: []
-        }
-    },
-
     render() {
         let {items, ...props} = this.props;
         return (
             <div {...props}>
-                <Metadata item={(this.getHovered() || this.getSelected() || {}).matadata}/>
+                <Metadata className="matadata-identifier" data={(this.getHovered() || this.getSelected() || {}).metadata}/>
                 <List
                     items={items}
                     renderItem={(...args) => {
                         var [item] = args;
                         return (
-                            <Identifier
-                                className={this.getClassName(item)}
-                                identifier={item}
-                                {...this.getMouseHandlers(...args)}
-                            />
+                            <div className={this.getClassName(item)}>
+                                <Identifier
+                                    className="identifier-item"
+                                    identifier={item}
+                                    {...this.getMouseHandlers(...args)}
+                                />
+                            </div>
                         )
                     }}
                     />

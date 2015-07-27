@@ -64,15 +64,24 @@ var ColumnView = React.createClass({
         this.search(identifier)
             .then((results) => {
                 items.push(results);
-                this.setState({items})
+                this.setState({items});
+
+                var $scroll = $(React.findDOMNode(this.refs.scroll));
+                $scroll.animate({scrollLeft: $scroll.prop("scrollWidth")}, 500);
             });
     },
 
     render() {
         var columns = this.state.items.map((item, index, items) => {
+            let columnClassName = ["link-identifier-column"];
+            if (index === items.length - 2) {
+                columnClassName.push("last-column");
+            }
+            columnClassName = columnClassName.join(" ");
+
             return (
                 <LinkIdentifierColumn
-                    className={index === items.length - 2 ? "last-column" : ""}
+                    className={columnClassName}
                     disabledItems={new Set(items.slice(0, index + 1).map(({identifier}) => identifier))}
                     key={item.identifier.name}
                     items={item.neighbours}
@@ -82,17 +91,25 @@ var ColumnView = React.createClass({
             )
         });
 
+        var identifierColumnClassName = ["identifier-column"];
+        if (this.state.items.length === 1) {
+            identifierColumnClassName.push("last-column");
+        }
+        identifierColumnClassName = identifierColumnClassName.join(" ");
+
         return (
-            <div className="column-list" style={{flex: 1, display: "flex", flexDirection: "column"}}>
-                <div style={{flex: 1, display: "flex", flexDirection: "row", overflowX: "auto", overflowY: "hidden"}}>
-                    <IdentifierColumn
-                        ref="root"
-                        className={this.state.items.length === 1 ? " last-column" : ""}
-                        items={[this.props.identifier]}
-                        onSelect={(identifier) => {this._identifierSelect(identifier)}}
-                        onHover={(identifier) => {this.refs.breadcrumbs.hover(identifier)}}
-                    />
-                    {columns}
+            <div className="column-list-component">
+                <div ref="scroll" className="columns-scroll">
+                    <div className="columns-container">
+                        <IdentifierColumn
+                            ref="root"
+                            className={identifierColumnClassName}
+                            items={[this.props.identifier]}
+                            onSelect={(identifier) => {this._identifierSelect(identifier)}}
+                            onHover={(identifier) => {this.refs.breadcrumbs.hover(identifier)}}
+                        />
+                        {columns}
+                    </div>
                 </div>
                 <BreadCrumbs
                     ref="breadcrumbs"

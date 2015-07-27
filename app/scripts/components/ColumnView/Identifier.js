@@ -2,7 +2,7 @@ var Identifier = React.createClass({
     render() {
         var {identifier, ...props} = this.props;
         return (
-            <div {...props}>{identifier.name}</div>
+            <div {...props} title={"Identifier: " + identifier.name}>{identifier.name}</div>
         );
     }
 });

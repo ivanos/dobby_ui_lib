@@ -1,0 +1,153 @@
+
+.column-list-component {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    /*margin: 15px;*/
+    /*border-radius: 5px;*/
+
+    overflow: hidden;
+
+    /*margin-top: 5px;*/
+}
+
+.columns-scroll {
+    flex: 1;
+    display: flex;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.columns-container {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    min-width: -webkit-min-content;
+
+    margin-top: 5px;
+}
+
+
+.identifier-column {
+    width: 300px;
+    background-color: #2d2f31;
+
+    margin-left: 15px;
+}
+
+.link-identifier-column {
+    width: 600px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: linear-gradient(
+            to right,
+            #3f4649, #3f4649 50%,
+            #2d2f31 50%, #2d2f31 100%);
+}
+
+.link-identifier-column:last-child {
+    margin-right: 15px;
+}
+
+.link-identifier-list-wrapper {
+    overflow-y: auto;
+    box-shadow: 0px 5px 20px -10px #22a86c inset;
+}
+
+.link-identifier-container .link-item,
+.link-identifier-container .identifier-item {
+    flex: 1;
+}
+
+.link-item,
+.identifier-item {
+    padding: 2px;
+    margin-left: 10px;
+}
+
+.link-identifier-container {
+    display: flex;
+}
+
+.breadcrumbs-list {
+    display: flex;
+    flex-direction: row;
+
+    height: 54px;
+    padding: 5px 16px;
+    box-sizing: border-box;
+    align-items: center;
+    background-color: #2d2f31;
+}
+
+/* to override .column-list-component ul selector */
+.column-list-component .breadcrumbs-list {
+    margin: 5px 15px 15px 15px;
+    border-radius: 0 0 5px 5px;
+}
+
+.breadcrumb-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.breadcrumb {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #3f4649;
+    margin: 0 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.column-list-component .selected {
+    background-color: #969696;
+}
+
+.column-list-component .last-column .selected {
+    background-color: #22a86c;
+}
+
+.column-list-component .hovered {
+    background-color: #5cb78e;
+}
+
+.column-list-component li {
+    cursor: pointer;
+}
+
+.column-list-component .disabled {
+    font-style: italic;
+    color: #d3d3d3;
+    cursor: not-allowed;
+}
+
+.column-list-component ul {
+    margin: 0;
+}
+
+.link-identifier-matadata-wrapper {
+    display: flex;
+    min-height: -webkit-min-content;
+}
+
+.link-identifier-matadata-wrapper .matadata-identifier,
+.link-identifier-matadata-wrapper .matadata-link {
+    flex: 1;
+    overflow: auto;
+}
+
+.matadata-identifier,
+.matadata-link {
+    padding: 15px;
+    height: 120px;
+    min-height: 120px;
+    box-sizing: border-box;
+    /*box-shadow: 0px -6px 20px -10px #22a86c inset;*/
+}
+

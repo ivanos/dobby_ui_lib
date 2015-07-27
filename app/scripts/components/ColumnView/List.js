@@ -14,10 +14,11 @@ var List = React.createClass({
     },
 
     render() {
+        var {items, renderItem, ...props} = this.props;
         return (
-            <ul>
-                {this.props.items.map((item, index, items) => {
-                    return <li key={index}>{this.props.renderItem(item, index, items)}</li>})}
+            <ul {...props}>
+                {items.map((item, index, items) => {
+                    return <li key={index}>{renderItem(item, index, items)}</li>})}
             </ul>
         );
     }

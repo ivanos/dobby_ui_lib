@@ -18,30 +18,32 @@ var LinkIdentifierColumn = React.createClass({
 
         return (
             <div {...props}>
-                <div>
-                    <Metadata data={link ? link.metadata : null} />
-                    <Metadata data={identifier ? identifier.metadata : null} />
+                <div className="link-identifier-matadata-wrapper">
+                    <Metadata className="matadata-link" data={link ? link.metadata : null} />
+                    <Metadata className="matadata-identifier" data={identifier ? identifier.metadata : null} />
                 </div>
-                <List
-                    items={items}
-                    renderItem={(...args) => {
-                        var [item] = args,
-                            className = this.getClassName(item);
+                <div className={"link-identifier-list-wrapper"}>
+                    <List
+                        items={items}
+                        renderItem={(...args) => {
+                            var [item] = args,
+                                className = this.getClassName(item);
 
-                        if (this.props.disabledItems.has(item.identifier)) {
-                            className += " disabled";
-                        }
+                            if (this.props.disabledItems.has(item.identifier)) {
+                                className += " disabled";
+                            }
 
-                        return (
-                            <LinkIdentifier
-                                className={className}
-                                link={item.link}
-                                identifier={item.identifier}
-                                {...this.getMouseHandlers(...args)}
-                            />
-                        );
-                    }}
+                            return (
+                                <LinkIdentifier
+                                    className={className}
+                                    link={item.link}
+                                    identifier={item.identifier}
+                                    {...this.getMouseHandlers(...args)}
+                                />
+                            );
+                        }}
                     />
+                </div>
             </div>
         );
     }

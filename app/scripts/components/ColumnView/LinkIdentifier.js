@@ -3,11 +3,12 @@ import Identifier from "./Identifier";
 
 var LinkIdentifier = React.createClass({
     render() {
-        var {link, identifier, ...props} = this.props;
+        var {link, identifier, className = "", ...props} = this.props;
+        className += " link-identifier-container";
         return (
-            <div {...props}>
-                <Link link={link}/>
-                <Identifier identifier={identifier} />
+            <div className={className} {...props}>
+                <Link className="link-item" link={link}/>
+                <Identifier className="identifier-item" identifier={identifier} />
             </div>
         );
     }
