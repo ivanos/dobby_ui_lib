@@ -2,7 +2,7 @@
 Dobby UI is a web UI for inspecting Dobby.  It relies on the Dobby REST interface.
 
 ## Usage
-Dobby UI can be included ith a Dobby REST server so that the Dobby UI is
+Dobby UI can be included in a Dobby REST server so that the Dobby UI is
 served by the same webserver providing the REST interface. See
 https://github.com/ivanos/dobby_allinone_node.git for an example.
 
