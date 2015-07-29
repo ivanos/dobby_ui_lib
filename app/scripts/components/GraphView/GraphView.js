@@ -7,17 +7,21 @@ var GraphView = React.createClass({
     getInitialState() {
         return {
             nodes: new Set([this.props.identifier]),
-            edges: new Set()
+            edges: new Set(),
+            searchMenuPosition: null,
+            searchIdentifier: null
         }
     },
 
     _addListeners(graph) {
         $(graph).on("doubleClickNode", this._dblClick);
         $(graph).on("contextmenu", this._rightClick);
+        $(graph).on("overNode", this._overNode);
+        $(graph).on("overEdge", this._overEdge);
     },
 
     componentDidMount() {
-        var graph = new Graph($(React.findDOMNode(this)));
+        var graph = new Graph($(React.findDOMNode(this.refs.graphContainer)));
 
         this._addListeners(graph);
         this._updateGraph(graph);
@@ -51,17 +55,34 @@ var GraphView = React.createClass({
         this._search(identifier);
     },
 
-    _searchParams() {
-        return new Promise((resolve, reject) => {
-            resolve({});
+    _rightClick(_, identifier) {
+        var {x, y} = window.event;
+        this.setState({
+            searchMenuPosition: {x, y},
+            searchIdentifier: identifier
         });
     },
 
-    _rightClick(_, identifier) {
-        // setContextState here?
+    _resetSearch() {
+        this.setState({
+            searchMenuPosition: null,
+            searchIdentifier: null
+        })
+    },
 
-        this._searchParams()
-            .then(params => this._search(identifier, params));
+    _onSearch(params) {
+        this._search(this.state.searchIdentifier, params)
+            .then(() => this._resetSearch())
+    },
+
+    _overNode(_, identifier) {
+
+        console.log(arguments);
+    },
+
+    _overEdge(_, link) {
+
+        console.log(arguments);
     },
 
     _updateGraph(graph) {
@@ -69,19 +90,38 @@ var GraphView = React.createClass({
         graph.addEdges(this.state.edges);
     },
 
-    componentDidUpdate() {
-        var graph = this.graph;
-        this._updateGraph(graph);
+    componentDidUpdate(_, oldState) {
+        if (this.state.nodes !== oldState.nodes || this.state.edges !== oldState.edges) {
+            var graph = this.graph;
+            this._updateGraph(graph);
+        }
     },
 
     render() {
-        return (<div style={{flex: 1, display: "flex", alignItems: "stretch"}}></div>);
+        return (
+            <div
+                style={{/*flex: 1, display: "flex", alignItems: "stretch"*/}}
+            >
+                <div
+                    style={{flex: 1, display: "flex", alignItems: "stretch"}}
+                    ref="graphContainer"
+                    onClick={() => this._resetSearch()}
+                />
+                <SearchMenu
+                    position={this.state.searchMenuPosition}
+                    onSubmit={this._onSearch}
+                />
+            </div>
+        );
     },
 
     // destructing component
     _removeListeners(graph) {
         $(graph).off("doubleClickNode", this._dblClick);
         $(graph).off("contextmenu", this._rightClick);
+        $(graph).off("overNode", this._overNode);
+        $(graph).off("overEdge", this._overEdge);
+
     },
 
     componentDidUnmount() {
@@ -94,118 +134,306 @@ var GraphView = React.createClass({
 
 });
 
-class GraphView1 extends React.Component {
+/**
+ * kvValue = {String: [String]}
+ * this.state.max_depth = Number
+ * this.state.results_filter = [String]
+ * this.state.match_links = [{key: [values]}, ]
+ * this.state.match_metadata = [{key: [values]}, ]
+ * this.state.match_terminal = [{key: [values]}, ]
+ */
 
-    constructor(props) {
-        super(props);
+const fieldPairs = [{
+    name: "Match Identifiers Metadata",
+    paramsKey: "match_metadata"
+}, {
+    paramsKey: "match_links",
+    name: "Match Links Metadata"
+}, {
+    paramsKey: "match_terminal",
+    name: "Match Identifiers Metadata"
+}];
 
-        this.state = {
-            data: {
-                nodes: [],
-                links: []
+
+var SearchMenu = React.createClass({
+
+    getInitialState() {
+        return {
+            params: {
+                max_depth: 1,
+                results_filter: [],
+                match_metadata: [],
+                match_links: [],
+                match_terminal: []
             }
-        };
-    }
+        }
+    },
 
-    componentDidMount() {
-        this.initGraph(this.props.identifier);
-    }
+    paramsChanged(paramsKey, value) {
+        var params = this.state.params;
 
-    initGraph(identifier) {
-        this.graph = new Graph($(React.findDOMNode(this)));
-        this.graph.addNode(identifier);
+        params[paramsKey] = value;
 
-        $(this.graph).on("overEdge", (event, link) => {
-            this.showTooltip(false, link);
-            this.graph.highlight({
-                nodes: [Identifier.get(link.source), Identifier.get(link.target)],
-                edges: [link]
-            });
-        });
-        //$(this.graph).on("outEdge", this.hideTooltip.bind(this));
-        $(this.graph).on("overNode", (event, identifier) => {
-            var identifiers = identifier.neighbours();
+        this.setState({params});
+    },
 
-            identifiers.push(identifier);
+    _addField(key) {
+        var params = this.state.params;
 
-            this.showTooltip(true, identifier);
-            this.graph.highlight({
-                mainNode: identifier,
-                nodes: identifiers,
-                edges: identifier.links()
-            });
-        });
+        params[key].push({[""]: []});
 
-        $(this.graph)
-            .on("doubleClickNode", (event, identifier) => this.search(identifier, {max_depth: 1}))
-            .on("contextmenu", (event, identifier) => this.showContextMenu(event, identifier));
+        this.setState({params})
+    },
 
-        $(this.graph.$el).on("click", () => {
-            this.hideTooltip();
-            this.hideContext();
-        });
-    }
+    _removeField(key, index) {
+        var fields = this.state.params[key];
+        fields.splice(index, 1);
+        this.setState({fields});
+    },
 
-    hideTooltip() {
-        //this.tooltip.hide();
-    }
-
-    showTooltip(isIdentifier, data) {
-        //this.tooltip.show({
-        //    title: isIdentifier ? `Identifier: ${data.name}` : `Link: ${data.source} -> ${data.target}`,
-        //    content: data.metadata.display()
-        //});
-    }
-
-
-    search(identifier, params) {
-
-        this.hideContext();
-
-        identifier.search(params)
-            .then(({links, identifiers}) => {
-
-                this.graph.addNodes(identifiers);
-                this.graph.addEdges(links.map((l) => {
-                    return {
-                        target: Identifier.get(l.target),
-                        source: Identifier.get(l.source),
-                        data: l
-                    }
-                }));
-
-            }, function(error) {
-                alert("Unable to search for neighbors:" + error);
-            });
-    }
-
-    showContextMenu(event, identifier) {
-
-        //var position = {
-        //    x: window.event.x,
-        //    y: window.event.y
-        //};
-        //
-        //this.searchComponent.setIdentifier(identifier);
-        //this.menu.showAt(position);
-    }
-
-    hideContext() {
-        //this.menu.hide();
-        //this.graph.highlight({
-        //    nodes: [],
-        //    edges: []
-        //});
-    }
-
-
+    _onSubmit(event) {
+        event.preventDefault();
+        console.log(this.state.params);
+        this.props.onSubmit(this.state.params);
+    },
 
     render() {
+        var {x: left=50000, y: top=50000} = this.props.position || {};
+
+        var fields = fieldPairs.map(({paramsKey, name}) => {
+            return (
+                <AddableFieldPair
+                    fields={this.state.params[paramsKey]}
+                    addField={() => this._addField(paramsKey)}
+                    removeField={(index) => this._removeField(paramsKey, index)}
+                    onChange={(fields) => this.paramsChanged(paramsKey, fields)}
+                    name={name}
+                />
+            )
+        });
+
         return (
-            <div style={{flex: 1, display: "flex", alignItems: "stretch"}}></div>
+            <div className="card" style={{position: "fixed", top, left}}>
+                <form onSubmit={this._onSubmit} onChange={(fields) => console.log(fields)}>
+                    <div>Search for Identifiers</div>
+                    <div>
+                        <div>Max Depth</div>
+                        <Field
+                            onChange={({target: {value}}) => this.paramsChanged("max_depth", parseInt(value, 10))}
+                            value={this.state.params.max_depth}
+                        />
+                    </div>
+                    <div>
+                        <div>Filter Metadata</div>
+                        <Field
+                            onChange={({target: {value}}) => this.paramsChanged("results_filter", value.split(" "))}
+                            value={this.state.params.results_filter.join(" ")}
+                        />
+                    </div>
+                    {fields}
+                    <Button type="submit" onClick={this._onSubmit} title="Search" />
+                </form>
+            </div>
         )
     }
-}
+});
+
+var AddableFieldPair = React.createClass({
+
+    _addField() {
+        this.props.addField();
+    },
+
+    _removeField(index) {
+        this.props.removeField(index);
+    },
+
+    _getKeyValueForField(field) {
+        var key = Object.keys(field)[0],
+            value = field[key];
+
+        return {key, value}
+    },
+
+    _keyChanged(index, key) {
+
+        var fields = this.props.fields,
+            {value} = this._getKeyValueForField(fields[index]);
+
+        fields[index] = {[key]: value};
+        this.props.onChange(fields);
+    },
+
+    _valueChanged(index, value) {
+        var fields = this.props.fields,
+            {key} = this._getKeyValueForField(fields[index]);
+
+        fields[index] = {[key]: value.split(" ")};
+        this.props.onChange(fields);
+    },
+
+    render() {
+        var fields = this.props.fields.map((field, index) => {
+            var {key, value} = this._getKeyValueForField(field);
+
+            return (
+                    <div key={index}>
+                        <Field onChange={({target: {value}}) => this._keyChanged(index, value)} value={key} />
+                        <Field onChange={({target: {value}}) => this._valueChanged(index, value)} value={value.join(" ")} />
+                        <Button onClick={() => this._removeField(index)} title="-" />
+                    </div>
+                )
+        });
+        return (
+            <div>
+                <div>
+                    <span>{this.props.name}</span>
+                    <Button onClick={this._addField} title="+" />
+                </div>
+                <div>
+                    {fields}
+                </div>
+            </div>
+        )
+    }
+});
+
+var Field = React.createClass({
+    render() {
+        return <input {...this.props} />;
+    }
+});
+
+var Button = React.createClass({
+    render() {
+        var {title, ...props} = this.props;
+        return <input type="button" {...props} value={title} />;
+    }
+});
+
+
+//[MATCH_IDENTIFIERS_TYPE]: "match_metadata",
+//[MATCH_LINKS_TYPE]: "match_links",
+//[FILTER_TYPE]: "results_filter",
+//[TERMINAL_TYPE]: "match_terminal",
+//[DEPTH_TYPE]: "max_depth"
+
+//
+//class GraphView1 extends React.Component {
+//
+//    constructor(props) {
+//        super(props);
+//
+//        this.state = {
+//            data: {
+//                nodes: [],
+//                links: []
+//            }
+//        };
+//    }
+//
+//    componentDidMount() {
+//        this.initGraph(this.props.identifier);
+//    }
+//
+//    initGraph(identifier) {
+//        this.graph = new Graph($(React.findDOMNode(this)));
+//        this.graph.addNode(identifier);
+//
+//        $(this.graph).on("overEdge", (event, link) => {
+//            this.showTooltip(false, link);
+//            this.graph.highlight({
+//                nodes: [Identifier.get(link.source), Identifier.get(link.target)],
+//                edges: [link]
+//            });
+//        });
+//        //$(this.graph).on("outEdge", this.hideTooltip.bind(this));
+//        $(this.graph).on("overNode", (event, identifier) => {
+//            var identifiers = identifier.neighbours();
+//
+//            identifiers.push(identifier);
+//
+//            this.showTooltip(true, identifier);
+//            this.graph.highlight({
+//                mainNode: identifier,
+//                nodes: identifiers,
+//                edges: identifier.links()
+//            });
+//        });
+//
+//        $(this.graph)
+//            .on("doubleClickNode", (event, identifier) => this.search(identifier, {max_depth: 1}))
+//            .on("contextmenu", (event, identifier) => this.showContextMenu(event, identifier));
+//
+//        $(this.graph.$el).on("click", () => {
+//            this.hideTooltip();
+//            this.hideContext();
+//        });
+//    }
+//
+//    hideTooltip() {
+//        //this.tooltip.hide();
+//    }
+//
+//    showTooltip(isIdentifier, data) {
+//        //this.tooltip.show({
+//        //    title: isIdentifier ? `Identifier: ${data.name}` : `Link: ${data.source} -> ${data.target}`,
+//        //    content: data.metadata.display()
+//        //});
+//    }
+//
+//
+//    search(identifier, params) {
+//
+//        this.hideContext();
+//
+//        identifier.search(params)
+//            .then(({links, identifiers}) => {
+//
+//                this.graph.addNodes(identifiers);
+//                this.graph.addEdges(links.map((l) => {
+//                    return {
+//                        target: Identifier.get(l.target),
+//                        source: Identifier.get(l.source),
+//                        data: l
+//                    }
+//                }));
+//
+//            }, function(error) {
+//                alert("Unable to search for neighbors:" + error);
+//            });
+//    }
+//
+//    showContextMenu(event, identifier) {
+//
+//        //var position = {
+//        //    x: window.event.x,
+//        //    y: window.event.y
+//        //};
+//        //
+//        //this.searchComponent.setIdentifier(identifier);
+//        //this.menu.showAt(position);
+//    }
+//
+//    hideContext() {
+//        //this.menu.hide();
+//        //this.graph.highlight({
+//        //    nodes: [],
+//        //    edges: []
+//        //});
+//    }
+//
+//
+//
+//    render() {
+//        return (
+//            <div style={{flex: 1, display: "flex", alignItems: "stretch"}}>
+//            </div>
+//        )
+//    }
+//}
+//
+
 
 /**
  * class Main extends Component {

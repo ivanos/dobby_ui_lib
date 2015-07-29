@@ -1,4 +1,4 @@
-
+// TODO: remove this file
 import Component from "./../Component";
 
 const MATCH_IDENTIFIERS_TYPE = Symbol("Match Identifiers type field"),
