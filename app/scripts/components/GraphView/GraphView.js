@@ -232,6 +232,7 @@ var SearchMenu = React.createClass({
                         <p>
                             <span>Max Depth </span>
                             <Field
+                                type="number"
                                 onChange={({target: {value}}) => this.paramsChanged("max_depth", parseInt(value, 10))}
                                 value={this.state.params.max_depth}
                             />

@@ -37,10 +37,8 @@ class App {
             Link.clear();
             Identifier.clear();
             $("[main]").hide();
-            //React.render(<div />, $("[main].container").get(0));
-            //this.main.hide(() => {
-                this.welcome.show();
-            //})
+            React.render(<div />, $("[main].container").get(0));
+            this.welcome.show();
         });
     }
 }
