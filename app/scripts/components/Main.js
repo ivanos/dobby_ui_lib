@@ -36,7 +36,7 @@ class Main extends React.Component {
 
         var $switchView = $(".switch-view");
 
-        $switchView.click(() => {
+        $switchView.on("click", () => {
             if ($switchView.text() === "List") {
                 $switchView.text("Graph");
                 this.showColumn();
@@ -47,6 +47,10 @@ class Main extends React.Component {
                 this.showGraph();
             }
         });
+    }
+
+    componentWillUnmount() {
+        $(".switch-view").off();
     }
 
     render() {

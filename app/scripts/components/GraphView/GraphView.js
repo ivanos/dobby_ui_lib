@@ -124,7 +124,7 @@ var GraphView = React.createClass({
 
     },
 
-    componentDidUnmount() {
+    componentWillUnmount() {
         var graph = this.graph;
 
         this._removeListeners(graph);

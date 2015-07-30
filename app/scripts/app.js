@@ -6,7 +6,7 @@ import Link from "./model/Link";
 $(() => {
 
     $("[welcome]").hide();
-    //$("[main]").hide();
+    $("[main]").hide();
 
     var app = new App();
 });
@@ -23,6 +23,7 @@ class App {
 
         $(this.welcome).on("root-identifiers", (event, ...identifiers) => {
             this.welcome.hide(() => {
+                $("[main]").show();
                 React.render(
                     <Main
                         identifiers={identifiers}
@@ -32,11 +33,13 @@ class App {
             });
         });
 
-        $(this.main).on("clear-identifier", () => {
+        $("[main] .clear-identifier").on("click", () => {
             Link.clear();
             Identifier.clear();
+            $("[main]").hide();
+            //React.render(<div />, $("[main].container").get(0));
             //this.main.hide(() => {
-            //    this.welcome.show();
+                this.welcome.show();
             //})
         });
     }
