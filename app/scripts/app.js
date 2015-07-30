@@ -21,11 +21,11 @@ class App {
     startup() {
         this.welcome.show();
 
-        $(this.welcome).on("root-identifier", (event, identifier) => {
+        $(this.welcome).on("root-identifiers", (event, ...identifiers) => {
             this.welcome.hide(() => {
                 React.render(
                     <Main
-                        identifier={identifier}
+                        identifiers={identifiers}
                         />,
                     $("[main].container").get(0)
                 );

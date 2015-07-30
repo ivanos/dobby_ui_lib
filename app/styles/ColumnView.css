@@ -136,6 +136,7 @@
     min-height: -webkit-min-content;
 }
 
+.matadata-identifier,
 .link-identifier-matadata-wrapper .matadata-identifier,
 .link-identifier-matadata-wrapper .matadata-link {
     flex: 1;

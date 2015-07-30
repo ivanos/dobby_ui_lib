@@ -19,15 +19,16 @@ class Welcome extends Component {
             this.$error.hide();
 
             var identifierName = this.find("input").val();
-            this.findIdentifier(identifierName);
+            this.findIdentifiers(identifierName.split(" "));
             event.preventDefault();
         });
     }
 
-    findIdentifier(name) {
-        Identifier.find(name)
-            .then((identifier) => {
-                $(this).trigger("root-identifier", identifier);
+    findIdentifiers(names) {
+        Promise.all(names.map((name) => {
+            return Identifier.find(name);
+        })).then((identifiers) => {
+                $(this).trigger("root-identifiers", identifiers);
             }, (error) => {
                 this.$error.show();
                 this.$error.text(error);

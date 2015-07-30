@@ -6,7 +6,7 @@ var GraphView = React.createClass({
 
     getInitialState() {
         return {
-            nodes: new Set([this.props.identifier]),
+            nodes: new Set(this.props.identifiers),
             edges: new Set(),
             searchMenuPosition: null,
             searchIdentifier: null
@@ -100,7 +100,7 @@ var GraphView = React.createClass({
     render() {
         return (
             <div
-                style={{/*flex: 1, display: "flex", alignItems: "stretch"*/}}
+                style={{flex: 1, display: "flex", alignItems: "stretch"}}
             >
                 <div
                     style={{flex: 1, display: "flex", alignItems: "stretch"}}
@@ -180,7 +180,7 @@ var SearchMenu = React.createClass({
     _addField(key) {
         var params = this.state.params;
 
-        params[key].push({[""]: []});
+        params[key].push({key: "", value: []});
 
         this.setState({params})
     },
@@ -191,10 +191,22 @@ var SearchMenu = React.createClass({
         this.setState({fields});
     },
 
+    _normaliseValues(params) {
+        var {max_depth, results_filter, ...toNormalise} = params;
+
+        Object.keys(toNormalise).map((key) => {
+            toNormalise[key] = toNormalise[key].reduce((obj, val) => {
+                obj[val.key] = val.value;
+            }, {});
+        });
+
+        return {max_depth, results_filter, ...toNormalise};
+    },
+
     _onSubmit(event) {
         event.preventDefault();
         console.log(this.state.params);
-        this.props.onSubmit(this.state.params);
+        this.props.onSubmit(this._normaliseValues(this.state.params));
     },
 
     render() {
@@ -213,22 +225,26 @@ var SearchMenu = React.createClass({
         });
 
         return (
-            <div className="card" style={{position: "fixed", top, left}}>
+            <div className="card menu" style={{position: "fixed", top, left}}>
                 <form onSubmit={this._onSubmit} onChange={(fields) => console.log(fields)}>
                     <div>Search for Identifiers</div>
                     <div>
-                        <div>Max Depth</div>
-                        <Field
-                            onChange={({target: {value}}) => this.paramsChanged("max_depth", parseInt(value, 10))}
-                            value={this.state.params.max_depth}
-                        />
+                        <p>
+                            <span>Max Depth </span>
+                            <Field
+                                onChange={({target: {value}}) => this.paramsChanged("max_depth", parseInt(value, 10))}
+                                value={this.state.params.max_depth}
+                            />
+                        </p>
                     </div>
                     <div>
-                        <div>Filter Metadata</div>
-                        <Field
-                            onChange={({target: {value}}) => this.paramsChanged("results_filter", value.split(" "))}
-                            value={this.state.params.results_filter.join(" ")}
-                        />
+                        <p>
+                            <span>Filter Metadata</span>
+                            <Field
+                                onChange={({target: {value}}) => this.paramsChanged("results_filter", value.split(" "))}
+                                value={this.state.params.results_filter.join(" ")}
+                            />
+                        </p>
                     </div>
                     {fields}
                     <Button type="submit" onClick={this._onSubmit} title="Search" />
@@ -248,33 +264,25 @@ var AddableFieldPair = React.createClass({
         this.props.removeField(index);
     },
 
-    _getKeyValueForField(field) {
-        var key = Object.keys(field)[0],
-            value = field[key];
-
-        return {key, value}
-    },
-
     _keyChanged(index, key) {
-
         var fields = this.props.fields,
-            {value} = this._getKeyValueForField(fields[index]);
+            {value} = fields[index];
 
-        fields[index] = {[key]: value};
+        fields[index] = {key, value};
         this.props.onChange(fields);
     },
 
     _valueChanged(index, value) {
         var fields = this.props.fields,
-            {key} = this._getKeyValueForField(fields[index]);
+            {key} = fields[index];
 
-        fields[index] = {[key]: value.split(" ")};
+        fields[index] = {key, value:value.split(" ")};
         this.props.onChange(fields);
     },
 
     render() {
         var fields = this.props.fields.map((field, index) => {
-            var {key, value} = this._getKeyValueForField(field);
+            var {key, value} = field;
 
             return (
                     <div key={index}>
@@ -287,8 +295,10 @@ var AddableFieldPair = React.createClass({
         return (
             <div>
                 <div>
-                    <span>{this.props.name}</span>
-                    <Button onClick={this._addField} title="+" />
+                    <p>
+                        <span>{this.props.name}</span>
+                        <Button onClick={this._addField} title="+" />
+                    </p>
                 </div>
                 <div>
                     {fields}

@@ -47,8 +47,8 @@ var ColumnView = React.createClass({
     },
 
     componentDidMount() {
-        this._identifierSelect(this.props.identifier);
-        this.refs.root.select(this.props.identifier);
+        //this._identifierSelect(this.props.identifier);
+        //this.refs.root.select(this.props.identifier);
     },
 
     search(identifier) {
@@ -104,7 +104,7 @@ var ColumnView = React.createClass({
                         <IdentifierColumn
                             ref="root"
                             className={identifierColumnClassName}
-                            items={[this.props.identifier]}
+                            items={this.props.identifiers}
                             onSelect={(identifier) => {this._identifierSelect(identifier)}}
                             onHover={(identifier) => {this.refs.breadcrumbs.hover(identifier)}}
                         />

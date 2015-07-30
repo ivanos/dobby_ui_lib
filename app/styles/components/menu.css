@@ -1,25 +1,29 @@
 
-[menu] {
+.menu {
     position: absolute;
 }
 
-[menu] input, [menu] p {
+.menu input, .menu p {
     margin: 1px;
     padding: 1px;
     font-size: 75%;
 }
 
-[menu] input {
+.menu input {
     height: 25px;
 }
 
-[menu] button {
+.menu button,
+.menu input[type=button],
+.menu input[type=submit] {
     margin-top: 5px;
     padding: 5px 20px;
     font-size: 75%;
 }
 
-[menu] button:hover {
+.menu button:hover,
+.menu input[type=button]:hover,
+.menu input[type=submit]:hover {
     border-bottom: 4px solid #069153;
     padding-bottom: 1px;
 }

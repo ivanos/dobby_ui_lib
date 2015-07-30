@@ -1,8 +1,6 @@
 import Component from "../Component";
 import Tooltip from "./Tooltip";
 import Graph from "./D3Graph";
-import Menu from "./Menu";
-import Search from "./Search";
 
 import ColumnView from "./ColumnView/ColumnView";
 import GraphView from "./GraphView/GraphView";
@@ -55,10 +53,10 @@ class Main extends React.Component {
         var content = "View is not defined";
 
         if (this.state.currentView === GRAPH_VIEW) {
-            content = <GraphView identifier={this.props.identifier} />
+            content = <GraphView identifiers={this.props.identifiers} />
         } else if (this.state.currentView === COLUMN_VIEW) {
             content = <ColumnView
-                identifier={this.props.identifier}
+                identifiers={this.props.identifiers}
             />
         }
 
