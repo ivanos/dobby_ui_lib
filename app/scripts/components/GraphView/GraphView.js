@@ -9,7 +9,9 @@ var GraphView = React.createClass({
             nodes: new Set(this.props.identifiers),
             edges: new Set(),
             searchMenuPosition: null,
-            searchIdentifier: null
+            searchIdentifier: null,
+            hoveredLink: null,
+            hoveredIdentifier: null
         }
     },
 
@@ -63,41 +65,20 @@ var GraphView = React.createClass({
         });
     },
 
-    _resetSearch() {
-        this.setState({
-            searchMenuPosition: null,
-            searchIdentifier: null
-        })
-    },
-
     _onSearch(params) {
         this._search(this.state.searchIdentifier, params)
-            .then(() => this._resetSearch())
+            .then(() => this.setState({
+                searchMenuPosition: null,
+                searchIdentifier: null
+            }))
     },
 
     _overNode(_, identifier) {
-        var graph = this.graph,
-            links = [...this.state.edges].filter((link) => {
-                return link.target == identifier || link.source == identifier;
-            }),
-            nodes = [...new Set(links.reduce((a, link) => {
-                a.push(link.target, link.source);
-                return a;
-            }, []))],
-            edges = links.map((l) => l.data);
-
-
-        graph.highlight({nodes, edges, mainNode: identifier});
-
+        this.setState({hoveredIdentifier: identifier});
     },
 
     _overEdge(_, link) {
-        var graph = this.graph;
-
-        graph.highlight({
-            nodes: [Identifier.get(link.source), Identifier.get(link.target)],
-            edges: [link]}
-        );
+        this.setState({hoveredLink: link});
     },
 
     _updateGraph(graph) {
@@ -105,16 +86,55 @@ var GraphView = React.createClass({
         graph.addEdges(this.state.edges);
     },
 
+    _highlightGraph(graph) {
+        var edgesToHighlight = [],
+            nodesToHighlight = [],
+            mainHighlightNode = null;
+
+        let link = this.state.hoveredLink;
+        if (link) {
+            nodesToHighlight = [Identifier.get(link.source), Identifier.get(link.target)];
+            edgesToHighlight = [link];
+        }
+
+        let identifier = this.state.hoveredIdentifier;
+        if (identifier) {
+            let links = [...this.state.edges].filter((link) => {
+                return link.target == identifier || link.source == identifier;
+            });
+
+            nodesToHighlight = [...new Set(links.reduce((a, link) => {
+                a.push(link.target, link.source);
+                return a;
+            }, [identifier]))];
+
+            edgesToHighlight = links.map((l) => l.data);
+            mainHighlightNode = identifier;
+        }
+
+        graph.highlight({nodes: nodesToHighlight, edges: edgesToHighlight, mainNode: mainHighlightNode});
+
+    },
+
     componentDidUpdate(_, oldState) {
+        var graph = this.graph;
+
         if (this.state.nodes !== oldState.nodes || this.state.edges !== oldState.edges) {
-            var graph = this.graph;
             this._updateGraph(graph);
+        }
+
+        if (this.state.hoveredLink !== oldState.hoveredLinks || this.state.hoveredIdentifier !== oldState.hoveredIdentifier) {
+            this._highlightGraph(graph);
         }
     },
 
     _onContainerClick() {
-        this._resetSearch();
-        this.graph.highlight({nodes: [], edges: []});
+        this.setState({
+            hoveredLink: null,
+            hoveredIdentifier: null,
+            searchMenuPosition: null,
+            searchIdentifier: null
+        });
     },
 
     render() {
