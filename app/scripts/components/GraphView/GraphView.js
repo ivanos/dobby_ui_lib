@@ -76,13 +76,28 @@ var GraphView = React.createClass({
     },
 
     _overNode(_, identifier) {
+        var graph = this.graph,
+            links = [...this.state.edges].filter((link) => {
+                return link.target == identifier || link.source == identifier;
+            }),
+            nodes = [...new Set(links.reduce((a, link) => {
+                a.push(link.target, link.source);
+                return a;
+            }, []))],
+            edges = links.map((l) => l.data);
 
-        console.log(arguments);
+
+        graph.highlight({nodes, edges, mainNode: identifier});
+
     },
 
     _overEdge(_, link) {
+        var graph = this.graph;
 
-        console.log(arguments);
+        graph.highlight({
+            nodes: [Identifier.get(link.source), Identifier.get(link.target)],
+            edges: [link]}
+        );
     },
 
     _updateGraph(graph) {
@@ -97,6 +112,11 @@ var GraphView = React.createClass({
         }
     },
 
+    _onContainerClick() {
+        this._resetSearch();
+        this.graph.highlight({nodes: [], edges: []});
+    },
+
     render() {
         return (
             <div
@@ -105,7 +125,7 @@ var GraphView = React.createClass({
                 <div
                     style={{flex: 1, display: "flex", alignItems: "stretch"}}
                     ref="graphContainer"
-                    onClick={() => this._resetSearch()}
+                    onClick={this._onContainerClick}
                 />
                 <SearchMenu
                     position={this.state.searchMenuPosition}
