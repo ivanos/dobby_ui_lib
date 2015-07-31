@@ -28,13 +28,14 @@ class D3Graph extends Graph {
         //});
 
         this.force = d3.layout.force()
+
             .linkStrength(1)
             .friction(0.9)
-            .linkDistance(150)
-            .charge(-30)
-            .gravity(0)
-            .theta(0.8)
-            .alpha(0.1);
+            .linkDistance(450)
+            .charge(-600)
+            .gravity(0);
+            //.theta(0.8)
+            //.alpha(0.001);
     }
 
     createEdge(source, target, data) {
@@ -61,7 +62,7 @@ class D3Graph extends Graph {
         function tick() {
 
             node
-                .each(collide(.5))
+                .each(collide(1))
                 .attr("transform", function(d) { return `translate(${d.x}, ${d.y})`;});
 
             containerEl.selectAll(".link").attr("x1", function(d) { return d.source.x; })
@@ -190,7 +191,7 @@ class D3Graph extends Graph {
 
         function dragend(d, i) {
             isDrag = false;
-            d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
+            //d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
             tick();
             force.start();
         }
