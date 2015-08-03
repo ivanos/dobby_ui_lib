@@ -20,6 +20,7 @@ class Graph extends Component {
         this.graph.edges = [...this.edgesMap.values()];
     }
 
+    // TODO: change to setNodes
     addNodes(nodes) {
         for (let data of nodes) {
             if (this.nodesMap.get(data)) {continue;}
@@ -41,6 +42,7 @@ class Graph extends Component {
         return new Edge(sourceId, targetId, data);
     }
 
+    // TODO: change to setEdges
     addEdges(edges) {
         for (let {source, target, data} of edges) {
             if (this.edgesMap.get(data)) {continue;}

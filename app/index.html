@@ -12,10 +12,6 @@
 
     <script src="lib/d3/d3.js"></script>
 
-    <script src="lib/sigma.js/sigma.min.js"></script>
-    <script src="lib/sigma.js/plugins/sigma.renderers.customShapes.min.js"></script>
-    <script src="lib/sigma.js/plugins/sigma.layout.forceAtlas2.min.js"></script>
-
     <script src="scripts/app.js"></script>
 </head>
 <body>
@@ -23,8 +19,9 @@
         <div class="header">
             <h1 class="title">Dobby</h1>
             <div main>
-                <span>Root identifier:</span>
-                <span class="identifier-name"></span>
+                <!--<span>Root identifier:</span>-->
+                <!--<span class="identifier-name"></span>-->
+                <!--<button class="add-identifier">Add</button>-->
                 <button class="clear-identifier">Clear</button>
             </div>
             <div class="spacer"></div>
@@ -37,7 +34,7 @@
         <div class="container" welcome>
             <div class="card">
                 <h1>Dobby</h1>
-                <p>Graph Visualiser Tool</p>
+                <p>Graph Visualizer Tool</p>
 
                 <form>
                     <input type="text" placeholder="Identifier name" value="PH4/VH1/OFS1"/>
@@ -47,22 +44,7 @@
             </div>
         </div>
 
-        <div class="container main-container" main>
-            <div graph class="graph-container"></div>
-            <div list class="list-container"></div>
-            <div menu search class="card">
-                <p>Search for identifiers</p>
-                <div class="field-group-container"></div>
-                <button class="submit-search">Search</button>
-            </div>
-            <div tooltip class="tooltip">
-                <div class="card">
-                    <h1 class="title">Title</h1>
-                    <p class="content">Content</p>
-                </div>
-            </div>
-            <div tooltip class="tooltip-placeholder"></div>
-        </div>
+        <div class="container" main></div>
     </div>
 
 </body>
