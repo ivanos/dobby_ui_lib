@@ -26,9 +26,10 @@ class Welcome extends Component {
 
     findIdentifiers(names) {
         Promise.all(names.map((name) => {
-            return Identifier.find(name);
+            return Identifier.find(name)
+                .catch(() => Promise.resolve());
         })).then((identifiers) => {
-                $(this).trigger("root-identifiers", identifiers);
+                $(this).trigger("root-identifiers", identifiers.filter((i) => i));
             }, (error) => {
                 this.$error.show();
                 this.$error.text(error);
