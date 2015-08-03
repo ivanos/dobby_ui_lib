@@ -1,6 +1,7 @@
 import Graph from "../D3Graph";
 import Identifier from "../../model/Identifier";
 import SearchMenu from "./SearchMenu";
+import Metadata from "../ColumnView/Metadata";
 
 var GraphView = React.createClass({
 
@@ -138,6 +139,21 @@ var GraphView = React.createClass({
     },
 
     render() {
+        var {hoveredIdentifier, hoveredLink} = this.state,
+            tooltip = null;
+
+        if (hoveredIdentifier || hoveredLink) {
+            let data = hoveredIdentifier || hoveredLink,
+                isIdentifier = hoveredIdentifier !== null;
+
+            tooltip = (
+                <Tooltip
+                    title={isIdentifier ? `Identifier: ${data.name}` : `Link: ${data.source} -> ${data.target}`}
+                    content={<Metadata data={data.metadata} />}
+                    />);
+        }
+
+
         return (
             <div
                 style={{flex: 1, display: "flex", alignItems: "stretch"}}
@@ -151,6 +167,7 @@ var GraphView = React.createClass({
                     position={this.state.searchMenuPosition}
                     onSubmit={this._onSearch}
                 />
+                {tooltip}
             </div>
         );
     },
@@ -174,6 +191,42 @@ var GraphView = React.createClass({
 
 });
 
+var Tooltip = React.createClass({
+    getInitialState() {
+        return {
+
+        }
+    },
+
+    render() {
+        var position = {
+            [this.state.hovered ? "left" : "right"]: 16
+        };
+        return (
+            <div style={{}}>
+                <div className="card" style={{opacity: 0.8, position: "absolute", top: 20, right: 16, maxWidth: 400}}>
+                    <h1>{this.props.title}</h1>
+                    <p >{this.props.content}</p>
+                </div>
+                {
+                    //<div
+                    //    onMouseEnter={() => {this.setState({hovered: true})}}
+                    //    onMouseLeave={() => {this.setState({hovered: false})}}
+                    //    style={{position: "absolute", right: 0, top: 0, width: "100%", height: "100%"}}
+                    //    ></div>
+                }
+            </div>
+        )
+    }
+});
+
+//-       <div tooltip class="tooltip">-->
+//    <!--  <div class="card">-->
+//    <!--      <h1 class="title">Title</h1>-->
+//    <!--      <p class="content">Content</p>-->
+//    <!--  </div>-->
+//    <!--</div>-->
+//    <!--<div tooltip class="tooltip-placeholder"></div>-->
 
 //[MATCH_IDENTIFIERS_TYPE]: "match_metadata",
 //[MATCH_LINKS_TYPE]: "match_links",

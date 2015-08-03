@@ -21,21 +21,21 @@
     position: relative;
 }
 
-.tooltip, .tooltip-placeholder {
-    position: absolute;
-    right: 16px;
-    top: 16px;
-    max-width: 400px;
-}
+/*.tooltip, .tooltip-placeholder {*/
+    /*position: absolute;*/
+    /*right: 16px;*/
+    /*top: 16px;*/
+    /*max-width: 400px;*/
+/*}*/
 
-.tooltip .card {
-    opacity: .8;
-    transition: opacity ease-in-out 300ms;
-}
+/*.tooltip .card {*/
+    /*opacity: .8;*/
+    /*transition: opacity ease-in-out 300ms;*/
+/*}*/
 
-.tooltip .card:hover {
-    opacity: .9;
-}
+/*.tooltip .card:hover {*/
+    /*opacity: .9;*/
+/*}*/
 
 .node ellipse {
     fill: rgb(150, 150, 150);
