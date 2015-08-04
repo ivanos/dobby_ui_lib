@@ -2,6 +2,8 @@ import Graph from "../D3Graph";
 import Identifier from "../../model/Identifier";
 import SearchMenu from "./SearchMenu";
 import Tooltip from "./Tooltip";
+import Metadata from "../ColumnView/Metadata";
+
 
 var GraphView = React.createClass({
 

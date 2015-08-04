@@ -1,5 +1,4 @@
 import Component from "../Component";
-import Tooltip from "./Tooltip";
 import Graph from "./D3Graph";
 
 import ColumnView from "./ColumnView/ColumnView";
