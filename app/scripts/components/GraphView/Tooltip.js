@@ -1,5 +1,3 @@
-import Metadata from "../ColumnView/Metadata";
-
 var Tooltip = React.createClass({
     getInitialState() {
         return {
