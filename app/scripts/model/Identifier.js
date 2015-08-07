@@ -29,7 +29,7 @@ class Identifier {
         return [...identifiers.values()];
     }
 
-    search({max_depth=1, traversal="depth", match_metadata=null, results_filter=null, match_terminal=null, match_links=null}) {
+    search({match_metadata, results_filter, match_terminal, match_links, max_depth=1, traversal="depth"}) {
         //params = {
         //    "max_depth":1,
         //    "traversal":"depth",
@@ -38,7 +38,7 @@ class Identifier {
         //    //    "type":"IPV4"
         //    //},
         //    //"match_links":{
-        //    //    "type":"IP-MAC"
+        //    //    "type": ["IP-MAC"]
         //    //},
         //    //"results_filter":["capabilities"],
         //    //"match_terminal":{
@@ -51,10 +51,10 @@ class Identifier {
             traversal
         };
 
-        if (match_metadata) {params.match_metadata = match_metadata}
-        if (match_links) {params.match_links = match_links}
-        if (results_filter) {params.results_filter = results_filter}
-        if (match_terminal) {params.match_terminal = match_terminal}
+        if (match_metadata && match_metadata.length > 0) {params.match_metadata = match_metadata}
+        if (match_links && match_links.length > 0) {params.match_links = match_links}
+        if (results_filter && results_filter.length > 0) {params.results_filter = results_filter}
+        if (match_terminal && match_terminal.length > 0) {params.match_terminal = match_terminal}
 
         return POST(`/identifier/${encodeURIComponent(this.name)}/search`, params)
             .then((res) => {console.log(res); return res;})

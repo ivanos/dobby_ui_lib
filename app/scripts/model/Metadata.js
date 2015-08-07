@@ -11,8 +11,10 @@ class Metadata {
             var res = ['<ul>'];
             for (let [key, value] of Object.entries(obj)) {
                 var val = value;
-                if (typeof val === 'object') {
-                    val = displayObject(val);
+                if (typeof val.value === 'object') {
+                    val = displayObject(val.value);
+                } else {
+                    val = val.value || val;
                 }
                 res.push(`<li>${key}: ${val}</li>`);
             }

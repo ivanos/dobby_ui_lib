@@ -5,8 +5,8 @@ import Link from "./model/Link";
 
 $(() => {
 
-    $("[main]").hide();
     $("[welcome]").hide();
+    $("[main]").hide();
 
     var app = new App();
 });
@@ -15,28 +15,30 @@ $(() => {
 class App {
     constructor() {
         this.welcome = new Welcome();
-        this.main = new Main();
-
         this.startup();
     }
 
     startup() {
         this.welcome.show();
-        this.main.hide();
 
-        $(this.welcome).on("root-identifier", (event, identifier) => {
+        $(this.welcome).on("root-identifiers", (event, ...identifiers) => {
             this.welcome.hide(() => {
-                this.main.setIdentifier(identifier);
-                this.main.show();
+                $("[main]").show();
+                React.render(
+                    <Main
+                        identifiers={identifiers}
+                        />,
+                    $("[main].container").get(0)
+                );
             });
         });
 
-        $(this.main).on("clear-identifier", () => {
+        $("[main] .clear-identifier").on("click", () => {
             Link.clear();
             Identifier.clear();
-            this.main.hide(() => {
-                this.welcome.show();
-            })
+            $("[main]").hide();
+            React.render(<div />, $("[main].container").get(0));
+            this.welcome.show();
         });
     }
 }
