@@ -33,9 +33,9 @@ class D3Graph extends Graph {
             .friction(0.9)
             .linkDistance(450)
             .charge(-600)
-            .gravity(0);
+            .gravity(0)
             //.theta(0.8)
-            //.alpha(0.001);
+            .alpha(1);
     }
 
     createEdge(source, target, data) {
@@ -54,13 +54,14 @@ class D3Graph extends Graph {
             sceneEl = this.d3El.select(".scene"),
             containerEl = this.d3El.select(".container"),
             scaleEl = this.d3El.select(".scale"),
-            force = this.force,
-            d3El = this.d3El;
+            force = this.force;
 
         var isDrag = false;
 
-        function tick() {
+        //force
+        //    .stop();
 
+        function tick() {
             node
                 .each(collide(1))
                 .attr("transform", function(d) { return `translate(${d.x}, ${d.y})`;});
@@ -158,17 +159,24 @@ class D3Graph extends Graph {
                 .data(links, (d) => d.id);
 
         function createNode(selection) {
-            selection
-                .append("ellipse")
-                //.attr("fill", "#FFF")
-                .attr("rx", 50)
-                .attr("ry", 25);
-
             selection.append("text")
-                .attr("x", -45)
+                .text((d) => d.data.name)
+                .attr("x", function() {
+                    let {width} = this.getBBox();
+                    return - width / 2
+                })
                 .attr("y", 6)
-                .style("font-size", 16)
-                .text((d) => d.data.name);
+                .style("font-size", 16);
+
+            selection
+                .insert("ellipse", ":first-child")
+                //.attr("fill", "#FFF")
+                .attr("rx", function(d, i) {
+                    var {width} = this.parentNode.getBBox();
+                    console.log(this);
+                    return width/2 + 15
+                })
+                .attr("ry", 25);
         }
 
         var node_drag = d3.behavior.drag()
@@ -266,10 +274,6 @@ class D3Graph extends Graph {
         mainNodeSelection.classed("main", true);
         mainNodeSelection.exit()
             .classed("main", false);
-    }
-
-    showMetadata() {
-
     }
 
     show(cb=() => {}) {
