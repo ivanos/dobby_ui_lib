@@ -32,8 +32,9 @@ class D3Graph extends Graph {
             .linkStrength(1)
             .friction(0.9)
             .linkDistance(450)
-            .charge(-600)
-            .gravity(0)
+            //.chargeDistance(5)
+            //.charge(0)
+            //.gravity(0.01)
             //.theta(0.8)
             .alpha(1);
     }
@@ -58,6 +59,13 @@ class D3Graph extends Graph {
 
         var isDrag = false;
 
+        if (links.length === 0) {
+            force.charge(0)
+                .gravity(0.05);
+        } else {
+            force.charge(-1800)
+                .gravity(0.01);
+        }
         //force
         //    .stop();
 
