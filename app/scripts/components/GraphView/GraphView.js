@@ -14,7 +14,13 @@ var GraphView = React.createClass({
             searchMenuPosition: null,
             searchIdentifier: null,
             hoveredLink: null,
-            hoveredIdentifier: null
+            hoveredIdentifier: null,
+            userTransform: false,
+            scale: 1,
+            offset: {
+                offsetX: 0,
+                offsetY: 0
+            }
         }
     },
 
@@ -23,6 +29,7 @@ var GraphView = React.createClass({
         $(graph).on("contextmenu", this._rightClick);
         $(graph).on("overNode", this._overNode);
         $(graph).on("overEdge", this._overEdge);
+        $(graph).on("fitTransform", this._handleFitTransform);
     },
 
     componentDidMount() {
@@ -129,6 +136,10 @@ var GraphView = React.createClass({
         if (this.state.hoveredLink !== oldState.hoveredLinks || this.state.hoveredIdentifier !== oldState.hoveredIdentifier) {
             this._highlightGraph(graph);
         }
+
+        if (this.state.scale !== oldState.scale || this.state.offset !== oldState.offset) {
+            graph.transform(this.state.scale, this.state.offset);
+        }
     },
 
     _onContainerClick() {
@@ -161,6 +172,11 @@ var GraphView = React.createClass({
                 style={{flex: 1, display: "flex", alignItems: "stretch"}}
             >
                 <div
+                    onWheel={this._handleZoom}
+                    onMouseDown={this._handleMouseDown}
+                    onMouseUp={this._handleMouseUp}
+                    onMouseMove={this._handleMouseMove}
+                    onScroll={(event)=> console.log(event)}
                     style={{flex: 1, display: "flex", alignItems: "stretch"}}
                     ref="graphContainer"
                     onClick={this._onContainerClick}
@@ -174,12 +190,90 @@ var GraphView = React.createClass({
         );
     },
 
+    _limitScale(scale, max=2, min=0.05) {
+        return Math.max(Math.min(scale, max), min);
+    },
+
+    _handleFitTransform(_, scale, offset) {
+        if (!this.state.userTransform) {
+            this.setState({
+                scale: this._limitScale(scale, 1),
+                offset
+            });
+        }
+    },
+
+    _handleZoom(event) {
+        event.preventDefault();
+
+        var {top, left} = React.findDOMNode(this).getBoundingClientRect(),
+
+            mouseY = event.clientY - top,
+            mouseX = event.clientX - left,
+
+            deltaScale = event.deltaY * 0.01,
+
+            maxScale = 2,
+            oldScale = this.state.scale,
+            scale = this._limitScale(oldScale - deltaScale, maxScale),
+
+            {offsetX, offsetY} = this.state.offset,
+            distanceX = (mouseX - offsetX),
+            distanceY = (mouseY - offsetY);
+
+        this.setState({
+            scale,
+            offset: {
+                offsetX: offsetX + distanceX * (1 - scale / oldScale),
+                offsetY: offsetY + distanceY * (1 - scale / oldScale)
+            },
+            userTransform: true
+        });
+    },
+
+    _handleMouseUp(event) {
+        this.setState({
+            mousePosition: null
+        })
+    },
+
+    _handleMouseDown(event) {
+        this.setState({
+            userTransform: true,
+            mousePosition: {
+                x: event.clientX,
+                y: event.clientY
+            }
+        })
+    },
+
+    _handleMouseMove(event) {
+        if (!this.state.mousePosition) { return; }
+
+        var {x: initialX, y: initialY} = this.state.mousePosition,
+            {clientX: currentX, clientY: currentY} = event;
+
+        var offset = {
+            offsetX: this.state.offset.offsetX - initialX + currentX,
+            offsetY: this.state.offset.offsetY - initialY + currentY
+        };
+
+        this.setState({
+            offset,
+            mousePosition: {
+                x: currentX,
+                y: currentY
+            }
+        });
+    },
+
     // destructing component
     _removeListeners(graph) {
         $(graph).off("doubleClickNode", this._dblClick);
         $(graph).off("contextmenu", this._rightClick);
         $(graph).off("overNode", this._overNode);
         $(graph).off("overEdge", this._overEdge);
+        $(graph).off("fitTransform", this._handleFitTransform);
 
     },
 

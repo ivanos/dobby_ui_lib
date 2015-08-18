@@ -55,7 +55,8 @@ class D3Graph extends Graph {
             sceneEl = this.d3El.select(".scene"),
             containerEl = this.d3El.select(".container"),
             scaleEl = this.d3El.select(".scale"),
-            force = this.force;
+            force = this.force,
+            graph = this;
 
         var isDrag = false;
 
@@ -106,19 +107,26 @@ class D3Graph extends Graph {
                     boundCenterX = minX + boundWidth/2,
                     boundCenterY = minY + boundHeight/2,
 
-                    scaleX = Math.min(Math.max((width)/boundWidth, 0.1), 1),
-                    scaleY = Math.min(Math.max((height)/boundHeight, 0.1), 1),
+                    //scaleX = Math.min(Math.max((width)/boundWidth, 0.1), 1),
+                    //scaleY = Math.min(Math.max((height)/boundHeight, 0.1), 1),
+                    //
+                    //scale = Math.min(scaleX, scaleY) || 1,
 
-                    scale = Math.min(scaleX, scaleY) || 1,
+                    scaleX = width/boundWidth,
+                    scaleY = height/boundHeight,
+
+                    scale = Math.min(scaleX, scaleY),
 
                     offsetX = centerX - boundCenterX*scale,
                     offsetY = centerY - boundCenterY*scale;
 
-                sceneEl
-                    .attr("transform", `translate(${offsetX}, ${offsetY})`);
 
-                scaleEl
-                    .attr("transform", `scale(${scale})`);
+                $(graph).trigger("fitTransform", [scale, {offsetX, offsetY}]);
+                //sceneEl
+                //    .attr("transform", `translate(${offsetX}, ${offsetY})`);
+                //
+                //scaleEl
+                //    .attr("transform", `scale(${scale})`);
             }
         }
 
@@ -222,6 +230,7 @@ class D3Graph extends Graph {
             .on("mouseover", (d) => {
                 $(this).trigger("overNode", d.data);
             })
+            .on("mousedown", () => d3.event.stopPropagation())
             .on("mouseout", (d) => {
                 $(this).trigger("outNode", d.data);
             })
@@ -254,6 +263,16 @@ class D3Graph extends Graph {
         // refresh force
     }
 
+    transform(scale, {offsetX, offsetY}) {
+        var sceneEl = this.d3El.select(".scene"),
+            scaleEl = this.d3El.select(".scale");
+
+        sceneEl
+            .attr("transform", `translate(${offsetX}, ${offsetY})`);
+
+        scaleEl
+            .attr("transform", `scale(${scale})`);
+    }
 
     highlight({nodes, edges: links, mainNode}) {
         var nodesSelection = this.d3El.select(".container")
