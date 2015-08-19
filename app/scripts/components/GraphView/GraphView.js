@@ -39,6 +39,8 @@ var GraphView = React.createClass({
         this._updateGraph(graph);
 
         this.graph = graph;
+
+        $(".reset-zoom").on("click", this._handleZoomFit.bind(this));
     },
 
     _search(identifier, params={}) {
@@ -194,13 +196,35 @@ var GraphView = React.createClass({
         return Math.max(Math.min(scale, max), min);
     },
 
+    _handleZoomFit() {
+        var fitTransform = this.state.fitTransform;
+        //todo: animate
+        this.setState({
+            ...fitTransform,
+            userTransform: false
+        });
+    },
+
     _handleFitTransform(_, scale, offset) {
+        var fitTransform = {
+            scale: this._limitScale(scale, 1),
+            offset
+        };
+
+        var state;
+
         if (!this.state.userTransform) {
-            this.setState({
-                scale: this._limitScale(scale, 1),
-                offset
-            });
+            state = {
+                fitTransform,
+                ...fitTransform
+            }
+        } else {
+            state = {
+                fitTransform
+            }
         }
+
+        this.setState(state);
     },
 
     _handleZoom(event) {
@@ -283,6 +307,8 @@ var GraphView = React.createClass({
         this._removeListeners(graph);
 
         this.graph = null;
+
+        $(".reset-zoom").off("click");
     }
 
 });

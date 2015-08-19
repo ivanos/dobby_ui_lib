@@ -36,13 +36,14 @@ class Main extends React.Component {
         var $switchView = $(".switch-view");
 
         $switchView.on("click", () => {
-            if ($switchView.text() === "List") {
+            // todo: get rid of this Panel View check
+            if ($switchView.text() === "Panel View") {
                 $switchView.text("Graph");
                 this.showColumn();
                 //this.hideTooltip();
 
             } else {
-                $switchView.text("List");
+                $switchView.text("Panel View");
                 this.showGraph();
             }
         });
