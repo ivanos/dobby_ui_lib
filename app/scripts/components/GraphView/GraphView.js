@@ -142,6 +142,12 @@ var GraphView = React.createClass({
         if (this.state.scale !== oldState.scale || this.state.offset !== oldState.offset) {
             graph.transform(this.state.scale, this.state.offset);
         }
+
+        if (this.state.userTransform) {
+            $(".reset-zoom").show();
+        } else {
+            $(".reset-zoom").hide();
+        }
     },
 
     _onContainerClick() {
