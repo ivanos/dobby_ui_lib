@@ -5,9 +5,75 @@ import Tooltip from "./Tooltip";
 import Metadata from "../ColumnView/Metadata";
 
 
+var autoTransform = Reflux.createAction();
+var userTransform = Reflux.createAction();
+var zoomFit = Reflux.createAction();
+
+var zoomStore = Reflux.createStore({
+    init() {
+        this.listenTo(autoTransform, this.onAutoTransform);
+        this.listenTo(userTransform, this.onUserTransform);
+        this.listenTo(zoomFit, this.onZoomFit);
+    },
+
+    getInitialState() {
+        this.isUserTransform = false;
+        return {
+            isUserTransform: this.isUserTransform,
+            scale: 1,
+            offset: {
+                offsetX: 0,
+                offsetY: 0
+            }
+        }
+    },
+
+    _limitScale(scale, max=2, min=0.05) {
+        return Math.max(Math.min(scale, max), min);
+    },
+
+    onZoomFit() {
+        this.isUserTransform = false;
+        this.trigger(this.autoTransform);
+    },
+
+    onUserTransform({scale, offset}) {
+        this.isUserTransform = true;
+        this.trigger({
+            isUserTransform: this.isUserTransform,
+            scale: this._limitScale(scale, 2),
+            offset
+        });
+    },
+
+    onAutoTransform({scale, offset}) {
+        this.autoTransform = {
+            isUserTransform: false,
+            scale: this._limitScale(scale, 1),
+            offset
+        };
+
+        if (!this.isUserTransform) {
+            this.trigger(this.autoTransform);
+        }
+    }
+});
+
+// ZoomFit button handler
+$(() => {
+    var $zoomFit = $(".reset-zoom")
+        .on("click", zoomFit);
+
+    zoomStore.listen((state) => {
+        $zoomFit[state.isUserTransform ? "show" : "hide"]();
+    });
+});
+
+// GraphView component
 var GraphView = React.createClass({
 
     getInitialState() {
+        var zoomStoreState = zoomStore.getInitialState();
         return {
             nodes: new Set(this.props.identifiers),
             edges: new Set(),
@@ -15,12 +81,7 @@ var GraphView = React.createClass({
             searchIdentifier: null,
             hoveredLink: null,
             hoveredIdentifier: null,
-            userTransform: false,
-            scale: 1,
-            offset: {
-                offsetX: 0,
-                offsetY: 0
-            }
+            ...zoomStoreState
         }
     },
 
@@ -40,7 +101,9 @@ var GraphView = React.createClass({
 
         this.graph = graph;
 
-        $(".reset-zoom").on("click", this._handleZoomFit.bind(this));
+        this.unsubscribe = zoomStore.listen((state) => {
+            this.setState(state);
+        });
     },
 
     _search(identifier, params={}) {
@@ -142,12 +205,6 @@ var GraphView = React.createClass({
         if (this.state.scale !== oldState.scale || this.state.offset !== oldState.offset) {
             graph.transform(this.state.scale, this.state.offset);
         }
-
-        if (this.state.userTransform) {
-            $(".reset-zoom").show();
-        } else {
-            $(".reset-zoom").hide();
-        }
     },
 
     _onContainerClick() {
@@ -198,39 +255,8 @@ var GraphView = React.createClass({
         );
     },
 
-    _limitScale(scale, max=2, min=0.05) {
-        return Math.max(Math.min(scale, max), min);
-    },
-
-    _handleZoomFit() {
-        var fitTransform = this.state.fitTransform;
-        //todo: animate
-        this.setState({
-            ...fitTransform,
-            userTransform: false
-        });
-    },
-
     _handleFitTransform(_, scale, offset) {
-        var fitTransform = {
-            scale: this._limitScale(scale, 1),
-            offset
-        };
-
-        var state;
-
-        if (!this.state.userTransform) {
-            state = {
-                fitTransform,
-                ...fitTransform
-            }
-        } else {
-            state = {
-                fitTransform
-            }
-        }
-
-        this.setState(state);
+        autoTransform({scale, offset});
     },
 
     _handleZoom(event) {
@@ -243,21 +269,19 @@ var GraphView = React.createClass({
 
             deltaScale = event.deltaY * 0.01,
 
-            maxScale = 2,
             oldScale = this.state.scale,
-            scale = this._limitScale(oldScale - deltaScale, maxScale),
+            scale = oldScale - deltaScale,
 
             {offsetX, offsetY} = this.state.offset,
             distanceX = (mouseX - offsetX),
             distanceY = (mouseY - offsetY);
 
-        this.setState({
+        userTransform({
             scale,
             offset: {
                 offsetX: offsetX + distanceX * (1 - scale / oldScale),
                 offsetY: offsetY + distanceY * (1 - scale / oldScale)
-            },
-            userTransform: true
+            }
         });
     },
 
@@ -288,8 +312,12 @@ var GraphView = React.createClass({
             offsetY: this.state.offset.offsetY - initialY + currentY
         };
 
+        userTransform({
+            scale: this.state.scale,
+            offset
+        });
+
         this.setState({
-            offset,
             mousePosition: {
                 x: currentX,
                 y: currentY
@@ -304,7 +332,6 @@ var GraphView = React.createClass({
         $(graph).off("overNode", this._overNode);
         $(graph).off("overEdge", this._overEdge);
         $(graph).off("fitTransform", this._handleFitTransform);
-
     },
 
     componentWillUnmount() {
@@ -314,7 +341,11 @@ var GraphView = React.createClass({
 
         this.graph = null;
 
-        $(".reset-zoom").off("click");
+        // TODO: move this out of here;
+        $(".reset-zoom")
+            .hide();
+
+        this.unsubscribe();
     }
 
 });
