@@ -4,10 +4,8 @@ import Graph from "./D3Graph";
 import ColumnView from "./ColumnView/ColumnView";
 import GraphView from "./GraphView/GraphView";
 
-
-const GRAPH_VIEW = Symbol("graph view");
-const COLUMN_VIEW = Symbol("column view");
-
+import {setView} from "./actions/mainView";
+import mainViewStore, {GRAPH_VIEW, COLUMN_VIEW} from "./stores/mainView";
 
 class Main extends React.Component {
     //static propTypes = { initialCount: React.PropTypes.number };
@@ -19,38 +17,14 @@ class Main extends React.Component {
         };
     }
 
-    showGraph() {
-        this.setState({
-            currentView: GRAPH_VIEW
-        });
-    }
-
-    showColumn() {
-        this.setState({
-            currentView: COLUMN_VIEW
-        })
-    }
-
     componentDidMount() {
-
-        var $switchView = $(".switch-view");
-
-        $switchView.on("click", () => {
-            // todo: get rid of this Panel View check
-            if ($switchView.text() === "Panel View") {
-                $switchView.text("Graph");
-                this.showColumn();
-                //this.hideTooltip();
-
-            } else {
-                $switchView.text("Panel View");
-                this.showGraph();
-            }
+        this.unsubscribe = mainViewStore.listen(({currentView}) => {
+            this.setState({currentView});
         });
     }
 
     componentWillUnmount() {
-        $(".switch-view").off();
+        this.unsubscribe();
     }
 
     render() {
