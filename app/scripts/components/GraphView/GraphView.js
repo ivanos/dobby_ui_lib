@@ -3,71 +3,23 @@ import Identifier from "../../model/Identifier";
 import SearchMenu from "./SearchMenu";
 import Tooltip from "./Tooltip";
 import Metadata from "../ColumnView/Metadata";
+import {
+    autoTransform,
+    userTransform,
+    zoomFit
+} from "../actions/graphTransform";
 
-
-var autoTransform = Reflux.createAction();
-var userTransform = Reflux.createAction();
-var zoomFit = Reflux.createAction();
-
-var zoomStore = Reflux.createStore({
-    init() {
-        this.listenTo(autoTransform, this.onAutoTransform);
-        this.listenTo(userTransform, this.onUserTransform);
-        this.listenTo(zoomFit, this.onZoomFit);
-    },
-
-    getInitialState() {
-        this.isUserTransform = false;
-        return {
-            isUserTransform: this.isUserTransform,
-            scale: 1,
-            offset: {
-                offsetX: 0,
-                offsetY: 0
-            }
-        }
-    },
-
-    _limitScale(scale, max=2, min=0.05) {
-        return Math.max(Math.min(scale, max), min);
-    },
-
-    onZoomFit() {
-        this.isUserTransform = false;
-        this.trigger(this.autoTransform);
-    },
-
-    onUserTransform({scale, offset}) {
-        this.isUserTransform = true;
-        this.trigger({
-            isUserTransform: this.isUserTransform,
-            scale: this._limitScale(scale, 2),
-            offset
-        });
-    },
-
-    onAutoTransform({scale, offset}) {
-        this.autoTransform = {
-            isUserTransform: false,
-            scale: this._limitScale(scale, 1),
-            offset
-        };
-
-        if (!this.isUserTransform) {
-            this.trigger(this.autoTransform);
-        }
-    }
-});
+import zoomStore from "../stores/graphTransform";
 
 // ZoomFit button handler
-$(() => {
-    var $zoomFit = $(".reset-zoom")
-        .on("click", zoomFit);
-
-    zoomStore.listen((state) => {
-        $zoomFit[state.isUserTransform ? "show" : "hide"]();
-    });
-});
+//$(() => {
+//    var $zoomFit = $(".reset-zoom")
+//        .on("click", zoomFit);
+//
+//    zoomStore.listen((state) => {
+//        $zoomFit[state.isUserTransform ? "show" : "hide"]();
+//    });
+//});
 
 // GraphView component
 var GraphView = React.createClass({
