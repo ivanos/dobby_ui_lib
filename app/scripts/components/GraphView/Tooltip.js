@@ -23,7 +23,8 @@ var Tooltip = React.createClass({
 
     render() {
         var position = {
-            [this.state.hovered ? "left" : "right"]: 16
+            //[this.state.hovered ? "left" : "right"]: 16
+            right: 16
         };
         return (
             <div style={{}}>

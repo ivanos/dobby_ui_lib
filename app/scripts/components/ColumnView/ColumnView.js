@@ -1,12 +1,14 @@
 import LinkIdentifierColumn from "./LinkIdentifierColumn";
 import BreadCrumbs from "./BreadCrumbs";
 import IdentifierColumn from "./IdentifierColumn";
+import panelViewStore from "../stores/panelView";
 
 var ColumnView = React.createClass({
 
     getInitialState() {
         return {
             items: [],
+            isLinksVisible: panelViewStore.getInitialState().isLinksVisible
         }
     },
 
@@ -47,8 +49,15 @@ var ColumnView = React.createClass({
     },
 
     componentDidMount() {
+        this.unPanelViewStore = panelViewStore.listen(({isLinksVisible}) => {
+            this.setState({isLinksVisible});
+        });
         //this._identifierSelect(this.props.identifier);
         //this.refs.root.select(this.props.identifier);
+    },
+
+    componentWillUnmount() {
+        this.unPanelViewStore();
     },
 
     search(identifier) {
@@ -73,10 +82,15 @@ var ColumnView = React.createClass({
 
     render() {
         var columns = this.state.items.map((item, index, items) => {
-            let columnClassName = ["link-identifier-column"];
-            if (index === items.length - 2) {
-                columnClassName.push("last-column");
+            let columnClassName = index === items.length - 2 ? ["last-column"] : [];
+
+            if (this.state.isLinksVisible) {
+                columnClassName.push("link-identifier-column");
+            } else {
+                columnClassName.push("identifier-column");
+                columnClassName.push("no-link");
             }
+
             columnClassName = columnClassName.join(" ");
 
             return (
@@ -87,8 +101,10 @@ var ColumnView = React.createClass({
                     items={item.neighbours}
                     onSelect={({identifier}) => this._identifierSelect(identifier, index + 1)}
                     onHover={(item={identifier: undefined}) => {this.refs.breadcrumbs.hover(item.identifier)}}
-                />
+                    />
             )
+
+
         });
 
         var identifierColumnClassName = ["identifier-column"];

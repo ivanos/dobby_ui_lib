@@ -2,6 +2,9 @@ import Welcome from "./components/Welcome";
 import Main from "./components/Main";
 import Identifier from "./model/Identifier";
 import Link from "./model/Link";
+import Header from "./components/Header";
+import appStateStore from "./components/stores/application";
+import {setRootIdentifiers} from "./components/actions/application";
 
 $(() => {
 
@@ -19,9 +22,12 @@ class App {
     }
 
     startup() {
+
+        React.render(<Header />, $('.viewport > .header-container').get(0));
+
         this.welcome.show();
 
-        $(this.welcome).on("root-identifiers", (event, ...identifiers) => {
+        var renderMain = (identifiers) => {
             this.welcome.hide(() => {
                 $("[main]").show();
                 React.render(
@@ -31,15 +37,31 @@ class App {
                     $("[main].container").get(0)
                 );
             });
-        });
+        };
 
-        $("[main] .clear-identifier").on("click", () => {
+        var renderWelcome = () => {
             Link.clear();
             Identifier.clear();
             $("[main]").hide();
             React.render(<div />, $("[main].container").get(0));
             this.welcome.show();
+        };
+
+        appStateStore.listen(({rootIdentifiers: identifiers}) => {
+            if (identifiers.length > 0) {
+                renderMain(identifiers);
+            } else {
+                renderWelcome();
+            }
         });
+
+        $(this.welcome).on("root-identifiers", (event, ...identifiers) => {
+            setRootIdentifiers(identifiers);
+        });
+
+        //$("[main] .clear-identifier").on("click", () => {
+        //
+        //});
     }
 }
 
