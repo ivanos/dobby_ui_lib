@@ -81,6 +81,9 @@ ul {
     display: flex;
 }
 
+.hidden {
+    display: none;
+}
 
 /*.main-container .column-view {*/
     /*min-width: -webkit-min-content;*/

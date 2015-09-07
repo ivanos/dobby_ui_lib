@@ -30,15 +30,22 @@ class Main extends React.Component {
     render() {
         var content = "View is not defined";
 
-        if (this.state.currentView === GRAPH_VIEW) {
-            content = <GraphView identifiers={this.props.identifiers} />
-        } else if (this.state.currentView === COLUMN_VIEW) {
-            content = <ColumnView
-                identifiers={this.props.identifiers}
-            />
-        }
+        //if (this.state.currentView === GRAPH_VIEW) {
+        //    content =
+        //} else if (this.state.currentView === COLUMN_VIEW) {
+        //    content =
+        //}
 
-        return (<div className="main-container">{content}</div>)
+        return (
+            <div className="main-container">
+                <div style={{flex: 1, display: this.state.currentView === GRAPH_VIEW ? "flex" : "none"}}>
+                    <GraphView identifiers={this.props.identifiers} />
+                </div>
+                <div style={{flex: 1, display: this.state.currentView === COLUMN_VIEW ? "flex" : "none"}}>
+                    <ColumnView identifiers={this.props.identifiers} />
+                </div>
+            </div>
+        )
     }
 }
 
