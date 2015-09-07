@@ -113,6 +113,15 @@
     background-color: #22a86c;
 }
 
+.column-list-component .last-column + .identifier-column {
+    margin-right: 15px;
+}
+
+.column-list-component .identifier-column.no-link .matadata-link,
+.column-list-component .identifier-column.no-link .link-item {
+    display: none;
+} 
+
 .column-list-component .hovered {
     background-color: #5cb78e;
 }
