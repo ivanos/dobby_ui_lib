@@ -89,6 +89,10 @@ ul {
     text-transform: none;
 }
 
+pre.matadata-value {
+   display: inline;
+}
+
 /*.main-container .column-view {*/
     /*min-width: -webkit-min-content;*/
     /*flex: 1;*/
