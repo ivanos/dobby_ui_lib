@@ -85,6 +85,10 @@ ul {
     display: none;
 }
 
+.tooltip-title-text {
+    text-transform: none;
+}
+
 /*.main-container .column-view {*/
     /*min-width: -webkit-min-content;*/
     /*flex: 1;*/
