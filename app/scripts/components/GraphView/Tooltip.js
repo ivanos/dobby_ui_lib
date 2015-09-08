@@ -6,19 +6,19 @@ var Tooltip = React.createClass({
     },
 
     _updatePlaceholderSize() {
-        var tooltip = React.findDOMNode(this.refs.tooltip),
-            placeholder = React.findDOMNode(this.refs.placeholder);
-
-        placeholder.style.width = tooltip.offsetWidth + "px";
-        placeholder.style.height = tooltip.offsetHeight + "px";
+        //var tooltip = React.findDOMNode(this.refs.tooltip),
+        //    placeholder = React.findDOMNode(this.refs.placeholder);
+        //
+        //placeholder.style.width = tooltip.offsetWidth + "px";
+        //placeholder.style.height = tooltip.offsetHeight + "px";
     },
 
     componentDidMount() {
-        this._updatePlaceholderSize();
+        //this._updatePlaceholderSize();
     },
 
     componentDidUpdate() {
-        this._updatePlaceholderSize();
+        //this._updatePlaceholderSize();
     },
 
     render() {
@@ -34,14 +34,15 @@ var Tooltip = React.createClass({
                     style={{opacity: 0.8, position: "absolute", top: 20, maxWidth: 400, ...position}}
                     >
                     <h1>{this.props.title}</h1>
-                    <p >{this.props.content}</p>
+                    <p>{this.props.content}</p>
                 </div>
-                <div
-                    ref="placeholder"
-                    onMouseEnter={() => {this.setState({hovered: true})}}
-                    onMouseLeave={() => {this.setState({hovered: false})}}
-                    style={{position: "absolute", right: 16, top: 20}}
-                    ></div>
+                {//<div
+                    //    ref="placeholder"
+                    //    onMouseEnter={() => {this.setState({hovered: true})}}
+                    //    onMouseLeave={() => {this.setState({hovered: false})}}
+                    //    style={{position: "absolute", right: 16, top: 20}}
+                    //    ></div>
+                }
             </div>
         )
     }

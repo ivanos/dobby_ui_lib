@@ -85,6 +85,14 @@ ul {
     display: none;
 }
 
+.tooltip-title-text {
+    text-transform: none;
+}
+
+pre.matadata-value {
+   display: inline;
+}
+
 /*.main-container .column-view {*/
     /*min-width: -webkit-min-content;*/
     /*flex: 1;*/

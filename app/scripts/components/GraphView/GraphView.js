@@ -176,9 +176,13 @@ var GraphView = React.createClass({
             let data = hoveredIdentifier || hoveredLink,
                 isIdentifier = hoveredIdentifier !== null;
 
+            var title = isIdentifier ?
+                (<span><span>Identifier: </span><span className="tooltip-title-text">{data.name}</span></span>) :
+                (<span><span>Link: </span><span className="tooltip-title-text">{data.source} -> {data.target}</span></span>);
+
             tooltip = (
                 <Tooltip
-                    title={isIdentifier ? `Identifier: ${data.name}` : `Link: ${data.source} -> ${data.target}`}
+                    title={title}
                     content={<Metadata data={data.metadata} />}
                     />);
         }
