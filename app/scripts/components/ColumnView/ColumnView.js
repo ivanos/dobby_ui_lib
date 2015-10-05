@@ -17,6 +17,7 @@ var ColumnView = React.createClass({
         links = links.sort((i1, i2) => {
             var name = identifier.name;
             // TODO: rewrite in elegant and robust way
+            // sorting links by identifiers name
             if (name === i1.target && name === i2.target) {
                 return i1.source.localeCompare(i2.source);
             } else if (name === i1.source && name === i2.source) {
