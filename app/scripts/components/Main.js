@@ -12,13 +12,14 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentView: mainViewStore.getInitialState().currentView
+            currentView: mainViewStore.getInitialState().currentView,
+            panelViewRoots: this.props.identifiers
         };
     }
 
     componentDidMount() {
-        this.unsubscribe = mainViewStore.listen(({currentView}) => {
-            this.setState({currentView});
+        this.unsubscribe = mainViewStore.listen((state) => {
+            this.setState(state);
         });
     }
 
@@ -35,7 +36,7 @@ class Main extends React.Component {
                     <GraphView identifiers={this.props.identifiers} />
                 </div>
                 <div style={{flex: 1, display: this.state.currentView === COLUMN_VIEW ? "flex" : "none"}}>
-                    <ColumnView identifiers={this.props.identifiers} />
+                    <ColumnView key={this.state.panelViewRoots[0].name} identifiers={this.state.panelViewRoots} />
                 </div>
             </div>
         )

@@ -13,6 +13,8 @@ import zoomStore from "../stores/graphTransform";
 import searchMenuStore from "../stores/searchMenu";
 
 import {showSearchMenu, hideSearchMenu} from "../actions/searchMenu";
+import {setView} from "../actions/mainView";
+import {COLUMN_VIEW} from "../stores/mainView";
 
 // ZoomFit button handler
 //$(() => {
@@ -108,7 +110,7 @@ var GraphView = React.createClass({
 
     _onPanelView() {
         var identifier = this.state.searchIdentifier;
-        // TODO: fixme:
+        setView(COLUMN_VIEW, [identifier]);
     },
 
     _overNode(_, identifier) {
