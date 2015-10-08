@@ -73,25 +73,27 @@ var GraphView = React.createClass({
     },
 
     _search(identifier, params={}) {
+        return identifier.search(params)
+            .then(this._onSearchSuccess);
+    },
+
+    _onSearchSuccess({identifiers, links}) {
         var {nodes, edges} = this.state;
         nodes = [...nodes];
         edges = [...edges];
 
-        return identifier.search(params)
-            .then(({identifiers, links}) => {
-                links = links.map((l) => {
-                    return {
-                        target: Identifier.get(l.target),
-                        source: Identifier.get(l.source),
-                        data: l
-                    }
-                });
+        links = links.map((l) => {
+            return {
+                target: Identifier.get(l.target),
+                source: Identifier.get(l.source),
+                data: l
+            }
+        });
 
-                nodes.push(...identifiers);
-                edges.push(...links);
+        nodes.push(...identifiers);
+        edges.push(...links);
 
-                this.setState({nodes: new Set(nodes), edges: new Set(edges)})
-            });
+        this.setState({nodes: new Set(nodes), edges: new Set(edges)})
     },
 
     _dblClick(_, identifier) {
@@ -110,6 +112,7 @@ var GraphView = React.createClass({
 
     _onPanelView() {
         var identifier = this.state.searchIdentifier;
+        hideSearchMenu();
         setView(COLUMN_VIEW, [identifier]);
     },
 
@@ -156,19 +159,28 @@ var GraphView = React.createClass({
 
     },
 
-    componentDidUpdate(_, oldState) {
+    componentDidUpdate(oldProps, oldState) {
         var graph = this.graph;
 
-        if (this.state.nodes !== oldState.nodes || this.state.edges !== oldState.edges) {
-            this._updateGraph(graph);
-        }
+        if (this.props.isRunning) {
+            if (this.state.nodes !== oldState.nodes ||
+                this.state.edges !== oldState.edges) {
+                this._updateGraph(graph);
+            }
 
-        if (this.state.hoveredLink !== oldState.hoveredLink || this.state.hoveredIdentifier !== oldState.hoveredIdentifier) {
-            this._highlightGraph(graph);
-        }
+            if (this.state.hoveredLink !== oldState.hoveredLink ||
+                this.state.hoveredIdentifier !== oldState.hoveredIdentifier) {
+                this._highlightGraph(graph);
+            }
 
-        if (!this._compareTransform(oldState, this.state)) {
-            graph.transform(this.state.scale, this.state.offset);
+            if (!this._compareTransform(oldState, this.state)) {
+                graph.transform(this.state.scale, this.state.offset);
+            }
+
+            if (oldProps.isRunning !== this.props.isRunning) {
+                this._updateGraph(graph);
+                this._highlightGraph(graph);
+            }
         }
     },
 
@@ -176,6 +188,13 @@ var GraphView = React.createClass({
         return oldTransform.scale === newTransform.scale &&
                 oldTransform.offset.offsetX === newTransform.offset.offsetX &&
                 oldTransform.offset.offsetY === newTransform.offset.offsetY
+    },
+
+    hoverIdentifier(identifier) {
+        this.setState({
+            hoveredIdentifier: identifier,
+            hoveredLink: null
+        })
     },
 
     _onContainerClick() {

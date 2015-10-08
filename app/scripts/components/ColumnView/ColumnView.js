@@ -63,6 +63,10 @@ var ColumnView = React.createClass({
 
     search(identifier) {
         return identifier.search({})
+            .then((result) => {
+                this.props.onSearchResults(result);
+                return result;
+            })
             .then(this._removeIdentifierFromResult(identifier))
             .then(({identifiers, links}) => {return {identifier, identifiers, links}})
             .then(this._sortResults)
@@ -71,6 +75,7 @@ var ColumnView = React.createClass({
 
     _identifierSelect(identifier, index=0) {
         var items = this.state.items.slice(0, index);
+        this.props.onIdentifierSelected(identifier);
         this.search(identifier)
             .then((results) => {
                 items.push(results);
