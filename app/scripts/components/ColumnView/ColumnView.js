@@ -17,6 +17,7 @@ var ColumnView = React.createClass({
         links = links.sort((i1, i2) => {
             var name = identifier.name;
             // TODO: rewrite in elegant and robust way
+            // sorting links by identifiers name
             if (name === i1.target && name === i2.target) {
                 return i1.source.localeCompare(i2.source);
             } else if (name === i1.source && name === i2.source) {
@@ -62,6 +63,10 @@ var ColumnView = React.createClass({
 
     search(identifier) {
         return identifier.search({})
+            .then((result) => {
+                this.props.onSearchResults(result);
+                return result;
+            })
             .then(this._removeIdentifierFromResult(identifier))
             .then(({identifiers, links}) => {return {identifier, identifiers, links}})
             .then(this._sortResults)
@@ -70,6 +75,7 @@ var ColumnView = React.createClass({
 
     _identifierSelect(identifier, index=0) {
         var items = this.state.items.slice(0, index);
+        this.props.onIdentifierSelected(identifier);
         this.search(identifier)
             .then((results) => {
                 items.push(results);

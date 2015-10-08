@@ -7,19 +7,22 @@ import GraphView from "./GraphView/GraphView";
 import {setView} from "./actions/mainView";
 import mainViewStore, {GRAPH_VIEW, COLUMN_VIEW} from "./stores/mainView";
 
+import {searchAction, searchStore} from "./actions/search";
+
+
 class Main extends React.Component {
-    //static propTypes = { initialCount: React.PropTypes.number };
-    //static defaultProps = { initialCount: 0 };
+
     constructor(props) {
         super(props);
         this.state = {
-            currentView: GRAPH_VIEW
+            currentView: mainViewStore.getInitialState().currentView,
+            panelViewRoots: this.props.identifiers
         };
     }
 
     componentDidMount() {
-        this.unsubscribe = mainViewStore.listen(({currentView}) => {
-            this.setState({currentView});
+        this.unsubscribe = mainViewStore.listen((state) => {
+            this.setState(state);
         });
     }
 
@@ -30,19 +33,26 @@ class Main extends React.Component {
     render() {
         var content = "View is not defined";
 
-        //if (this.state.currentView === GRAPH_VIEW) {
-        //    content =
-        //} else if (this.state.currentView === COLUMN_VIEW) {
-        //    content =
-        //}
-
         return (
             <div className="main-container">
                 <div style={{flex: 1, display: this.state.currentView === GRAPH_VIEW ? "flex" : "none"}}>
-                    <GraphView identifiers={this.props.identifiers} />
+                    <GraphView
+                        ref="graph"
+                        identifiers={this.props.identifiers}
+                        isRunning={this.state.currentView === GRAPH_VIEW}
+                    />
                 </div>
                 <div style={{flex: 1, display: this.state.currentView === COLUMN_VIEW ? "flex" : "none"}}>
-                    <ColumnView identifiers={this.props.identifiers} />
+                    <ColumnView
+                        key={this.state.panelViewRoots[0].name}
+                        identifiers={this.state.panelViewRoots}
+                        onSearchResults={(res) => {
+                            this.refs.graph._onSearchSuccess(res);
+                        }}
+                        onIdentifierSelected={(identifier) => {
+                            this.refs.graph.hoverIdentifier(identifier);
+                        }}
+                    />
                 </div>
             </div>
         )
@@ -53,15 +63,11 @@ class Main extends React.Component {
 export default Main;
 
 
-/**
- * Components:
- *
- * Main -> Manage switches between graph and Column
- *  Graph -> State - {identifiers, links}
- *      Tooltip ->
- *  Column -> State - {identifier, Neighbour: {identifiers, links}}
- *      Column ->
- *      Breadcrumbs ->
- *
- */
+
+searchStore.listen(function(state) {
+    console.log("store says: ", state);
+});
+
+//searchAction("test");
+
 

@@ -84,6 +84,7 @@ var SearchMenu = React.createClass({
 
         return (
             <div className="card menu" style={{position: "fixed", top, left}}>
+                <Button title="Show in Panel" onClick={this.props.onPanelView}/>
                 <form onSubmit={this._onSubmit} onChange={(fields) => console.log(fields)}>
                     <div>Search for Identifiers</div>
                     <div>

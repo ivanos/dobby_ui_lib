@@ -10,12 +10,17 @@ var mainViewStore = Reflux.createStore({
 
     getInitialState() {
         return {
-            currentView: GRAPH_VIEW
+            currentView: GRAPH_VIEW,
+            panelViewRoots: []
         }
     },
 
-    onSwitchView(viewType) {
-        this.trigger({currentView: viewType});
+    onSwitchView(viewType, panelViewRoots=null) {
+        let state = {currentView: viewType};
+        if (panelViewRoots !== null) {
+            state.panelViewRoots = panelViewRoots;
+        }
+        this.trigger(state);
     }
 });
 

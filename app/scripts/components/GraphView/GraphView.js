@@ -10,6 +10,11 @@ import {
 } from "../actions/graphTransform";
 
 import zoomStore from "../stores/graphTransform";
+import searchMenuStore from "../stores/searchMenu";
+
+import {showSearchMenu, hideSearchMenu} from "../actions/searchMenu";
+import {setView} from "../actions/mainView";
+import {COLUMN_VIEW} from "../stores/mainView";
 
 // ZoomFit button handler
 //$(() => {
@@ -25,15 +30,20 @@ import zoomStore from "../stores/graphTransform";
 var GraphView = React.createClass({
 
     getInitialState() {
-        var zoomStoreState = zoomStore.getInitialState();
+        var zoomStoreState = zoomStore.getInitialState(),
+            searchStoreState = searchMenuStore.getInitialState();
+
         return {
             nodes: new Set(this.props.identifiers),
             edges: new Set(),
-            searchMenuPosition: null,
-            searchIdentifier: null,
+
+            //searchMenuPosition: null,
+            //searchIdentifier: null,
+
             hoveredLink: null,
             hoveredIdentifier: null,
-            ...zoomStoreState
+            ...zoomStoreState,
+            ...searchStoreState
         }
     },
 
@@ -53,31 +63,37 @@ var GraphView = React.createClass({
 
         this.graph = graph;
 
-        this.unsubscribe = zoomStore.listen((state) => {
+        this.unZoomStore = zoomStore.listen((state) => {
+            this.setState(state);
+        });
+
+        this.unSearchMenuStore = searchMenuStore.listen((state) => {
             this.setState(state);
         });
     },
 
     _search(identifier, params={}) {
+        return identifier.search(params)
+            .then(this._onSearchSuccess);
+    },
+
+    _onSearchSuccess({identifiers, links}) {
         var {nodes, edges} = this.state;
         nodes = [...nodes];
         edges = [...edges];
 
-        return identifier.search(params)
-            .then(({identifiers, links}) => {
-                links = links.map((l) => {
-                    return {
-                        target: Identifier.get(l.target),
-                        source: Identifier.get(l.source),
-                        data: l
-                    }
-                });
+        links = links.map((l) => {
+            return {
+                target: Identifier.get(l.target),
+                source: Identifier.get(l.source),
+                data: l
+            }
+        });
 
-                nodes.push(...identifiers);
-                edges.push(...links);
+        nodes.push(...identifiers);
+        edges.push(...links);
 
-                this.setState({nodes: new Set(nodes), edges: new Set(edges)})
-            });
+        this.setState({nodes: new Set(nodes), edges: new Set(edges)})
     },
 
     _dblClick(_, identifier) {
@@ -86,18 +102,18 @@ var GraphView = React.createClass({
 
     _rightClick(_, identifier) {
         var {x, y} = window.event;
-        this.setState({
-            searchMenuPosition: {x, y},
-            searchIdentifier: identifier
-        });
+        showSearchMenu({x, y}, identifier);
     },
 
     _onSearch(params) {
         this._search(this.state.searchIdentifier, params)
-            .then(() => this.setState({
-                searchMenuPosition: null,
-                searchIdentifier: null
-            }))
+            .then(() => hideSearchMenu())
+    },
+
+    _onPanelView() {
+        var identifier = this.state.searchIdentifier;
+        hideSearchMenu();
+        setView(COLUMN_VIEW, [identifier]);
     },
 
     _overNode(_, identifier) {
@@ -143,28 +159,49 @@ var GraphView = React.createClass({
 
     },
 
-    componentDidUpdate(_, oldState) {
+    componentDidUpdate(oldProps, oldState) {
         var graph = this.graph;
 
-        if (this.state.nodes !== oldState.nodes || this.state.edges !== oldState.edges) {
-            this._updateGraph(graph);
-        }
+        if (this.props.isRunning) {
+            if (this.state.nodes !== oldState.nodes ||
+                this.state.edges !== oldState.edges) {
+                this._updateGraph(graph);
+            }
 
-        if (this.state.hoveredLink !== oldState.hoveredLinks || this.state.hoveredIdentifier !== oldState.hoveredIdentifier) {
-            this._highlightGraph(graph);
-        }
+            if (this.state.hoveredLink !== oldState.hoveredLink ||
+                this.state.hoveredIdentifier !== oldState.hoveredIdentifier) {
+                this._highlightGraph(graph);
+            }
 
-        if (this.state.scale !== oldState.scale || this.state.offset !== oldState.offset) {
-            graph.transform(this.state.scale, this.state.offset);
+            if (!this._compareTransform(oldState, this.state)) {
+                graph.transform(this.state.scale, this.state.offset);
+            }
+
+            if (oldProps.isRunning !== this.props.isRunning) {
+                this._updateGraph(graph);
+                this._highlightGraph(graph);
+            }
         }
     },
 
+    _compareTransform(oldTransform, newTransform) {
+        return oldTransform.scale === newTransform.scale &&
+                oldTransform.offset.offsetX === newTransform.offset.offsetX &&
+                oldTransform.offset.offsetY === newTransform.offset.offsetY
+    },
+
+    hoverIdentifier(identifier) {
+        this.setState({
+            hoveredIdentifier: identifier,
+            hoveredLink: null
+        })
+    },
+
     _onContainerClick() {
+        hideSearchMenu();
         this.setState({
             hoveredLink: null,
-            hoveredIdentifier: null,
-            searchMenuPosition: null,
-            searchIdentifier: null
+            hoveredIdentifier: null
         });
     },
 
@@ -204,6 +241,7 @@ var GraphView = React.createClass({
                 />
                 <SearchMenu
                     position={this.state.searchMenuPosition}
+                    onPanelView={this._onPanelView}
                     onSubmit={this._onSearch}
                 />
                 {tooltip}
@@ -249,7 +287,6 @@ var GraphView = React.createClass({
 
     _handleMouseDown(event) {
         this.setState({
-            userTransform: true,
             mousePosition: {
                 x: event.clientX,
                 y: event.clientY
@@ -268,16 +305,16 @@ var GraphView = React.createClass({
             offsetY: this.state.offset.offsetY - initialY + currentY
         };
 
-        userTransform({
-            scale: this.state.scale,
-            offset
-        });
-
         this.setState({
             mousePosition: {
                 x: currentX,
                 y: currentY
             }
+        });
+
+        userTransform({
+            scale: this.state.scale,
+            offset
         });
     },
 
@@ -297,11 +334,8 @@ var GraphView = React.createClass({
 
         this.graph = null;
 
-        // TODO: move this out of here;
-        $(".reset-zoom")
-            .hide();
-
-        this.unsubscribe();
+        this.unZoomStore();
+        this.unSearchMenuStore();
     }
 
 });
