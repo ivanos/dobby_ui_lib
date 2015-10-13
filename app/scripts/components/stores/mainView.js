@@ -1,5 +1,7 @@
 import {setView} from "../actions/mainView";
 
+import Reflux from "reflux";
+
 const GRAPH_VIEW = Symbol("graph view");
 const COLUMN_VIEW = Symbol("column view");
 

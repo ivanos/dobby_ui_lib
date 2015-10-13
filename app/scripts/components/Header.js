@@ -8,6 +8,7 @@ import mainViewStore, {GRAPH_VIEW, COLUMN_VIEW} from "./stores/mainView";
 import {hideLinkColumn, showLinkColumn} from "./actions/panelView";
 import panelViewStore from "./stores/panelView";
 
+import React from "react";
 
 var Header = React.createClass({
     getInitialState() {

@@ -1,6 +1,8 @@
 import Link from "./Link";
 import Identifier from "./Identifier";
 
+import React from "react";
+
 var LinkIdentifier = React.createClass({
     render() {
         var {link, identifier, className = "", ...props} = this.props;

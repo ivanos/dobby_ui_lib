@@ -3,6 +3,8 @@ import Metadata from "./Metadata";
 import LinkIdentifier from "./LinkIdentifier";
 import List from "./List";
 
+import React from "react";
+
 var LinkIdentifierColumn = React.createClass({
     mixins: [mouseEventsMixin],
 

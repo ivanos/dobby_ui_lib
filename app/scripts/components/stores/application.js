@@ -1,5 +1,6 @@
 import {setRootIdentifiers} from "../actions/application";
 
+import Reflux from "reflux";
 
 var appStateStore = Reflux.createStore({
     init() {

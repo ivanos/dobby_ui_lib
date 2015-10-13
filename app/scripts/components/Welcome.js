@@ -2,6 +2,8 @@
 import Identifier from "../model/Identifier";
 import Component from "../Component";
 
+import $ from "jquery";
+
 class Welcome extends Component {
     constructor() {
         super($("[welcome]"));

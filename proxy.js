@@ -31,3 +31,5 @@ module.exports.start = function(port) {
     server.listen(port || 5050);
     console.log("listening on port 5050");
 };
+
+module.exports.start();

@@ -1,8 +1,11 @@
+import Reflux from "reflux";
+
 import {
     autoTransform,
     userTransform,
     zoomFit
 } from "../actions/graphTransform";
+
 
 
 var zoomStore = Reflux.createStore({
