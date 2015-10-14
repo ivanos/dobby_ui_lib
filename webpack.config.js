@@ -12,6 +12,14 @@ module.exports = {
         filename: "app.js"
     },
     devtool: 'source-map',
+    devServer: {
+        port: 8000,
+        proxy: {
+            '/*': {
+                target: 'http://localhost:8080'
+            }
+        }
+    },
     module: {
         loaders: [{
             test: /\.js$/,

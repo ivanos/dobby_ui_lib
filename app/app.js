@@ -1,6 +1,8 @@
 // Import polyfill
 import 'babel-core/polyfill';
+import 'reset.css/reset.css';
 import './app.css';
+
 
 import $ from "jquery";
 import React from "react";
