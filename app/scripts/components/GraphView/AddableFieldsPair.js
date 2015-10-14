@@ -1,5 +1,7 @@
 import {Button, Field} from "../Common/Common";
 
+import React from "react";
+
 var AddableFieldsPair = React.createClass({
 
     _addField() {

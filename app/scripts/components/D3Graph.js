@@ -2,6 +2,9 @@
 import Graph from "./Graph";
 import {Edge} from "./Graph";
 
+import $ from "jquery";
+import d3 from "d3";
+
 
 class D3Graph extends Graph {
     constructor($el) {

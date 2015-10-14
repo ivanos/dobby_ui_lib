@@ -1,3 +1,4 @@
+import Reflux from "reflux";
 
 var searchAction = Reflux.createAction({
     asyncResult: true

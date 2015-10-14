@@ -2,6 +2,8 @@ import mouseEventsMixin from "./mouseEventsMixin";
 import List from "./List";
 import Identifier from "./Identifier";
 
+import React from "react";
+
 var Separator = React.createClass({
     render() {
         return <span>|</span>

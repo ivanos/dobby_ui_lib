@@ -3,6 +3,8 @@ import Metadata from "./Metadata";
 import Identifier from "./Identifier";
 import List from "./List";
 
+import React from "react";
+
 var IdentifierColumn = React.createClass({
 
     mixins: [mouseEventsMixin],

@@ -1,7 +1,7 @@
-@import "components/components.css";
+@import "styles/components/components.css";
 
-@import "landing.css";
-@import "ColumnView.css";
+@import "styles/landing.css";
+@import "styles/ColumnView.css";
 
 
 .error {

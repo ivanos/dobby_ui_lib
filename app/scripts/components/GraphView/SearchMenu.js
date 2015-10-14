@@ -1,6 +1,8 @@
 import AddableFieldsPair from "./AddableFieldsPair";
 import {Button, Field} from "../Common/Common";
 
+import React from "react";
+
 const fieldPairs = [{
     name: "Match Identifiers Metadata",
     paramsKey: "match_metadata"

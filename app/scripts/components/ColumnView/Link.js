@@ -1,3 +1,4 @@
+import React from "react";
 
 var Link = React.createClass({
     render() {

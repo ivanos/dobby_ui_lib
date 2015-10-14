@@ -1,3 +1,5 @@
+import React from "react";
+
 var Tooltip = React.createClass({
     getInitialState() {
         return {

@@ -3,6 +3,10 @@ import BreadCrumbs from "./BreadCrumbs";
 import IdentifierColumn from "./IdentifierColumn";
 import panelViewStore from "../stores/panelView";
 
+import $ from "jquery";
+import React from "react";
+import ReactDOM from "react-dom";
+
 var ColumnView = React.createClass({
 
     getInitialState() {
@@ -81,7 +85,7 @@ var ColumnView = React.createClass({
                 items.push(results);
                 this.setState({items});
 
-                var $scroll = $(React.findDOMNode(this.refs.scroll));
+                var $scroll = $(ReactDOM.findDOMNode(this.refs.scroll));
                 $scroll.animate({scrollLeft: $scroll.prop("scrollWidth")}, 500);
             });
     },

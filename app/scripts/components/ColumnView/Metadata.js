@@ -1,3 +1,4 @@
+import React from "react";
 
 var Metadata = React.createClass({
 

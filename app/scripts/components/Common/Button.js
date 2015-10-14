@@ -1,3 +1,4 @@
+import React from "react";
 
 var Button = React.createClass({
     render() {

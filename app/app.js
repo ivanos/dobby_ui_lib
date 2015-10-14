@@ -1,10 +1,21 @@
-import Welcome from "./components/Welcome";
-import Main from "./components/Main";
-import Identifier from "./model/Identifier";
-import Link from "./model/Link";
-import Header from "./components/Header";
-import appStateStore from "./components/stores/application";
-import {setRootIdentifiers} from "./components/actions/application";
+// Import polyfill
+import 'babel-core/polyfill';
+import 'reset.css/reset.css';
+import './app.css';
+
+
+import $ from "jquery";
+import React from "react";
+import ReactDOM from "react-dom";
+
+
+import Welcome from "./scripts/components/Welcome";
+import Main from "./scripts/components/Main";
+import Identifier from "./scripts/model/Identifier";
+import Link from "./scripts/model/Link";
+import Header from "./scripts/components/Header";
+import appStateStore from "./scripts/components/stores/application";
+import {setRootIdentifiers} from "./scripts/components/actions/application";
 
 $(() => {
 
@@ -23,14 +34,14 @@ class App {
 
     startup() {
 
-        React.render(<Header />, $('.viewport > .header-container').get(0));
+        ReactDOM.render(<Header />, $('.viewport > .header-container').get(0));
 
         this.welcome.show();
 
         var renderMain = (identifiers) => {
             this.welcome.hide(() => {
                 $("[main]").show();
-                React.render(
+                ReactDOM.render(
                     <Main
                         identifiers={identifiers}
                         />,
@@ -43,7 +54,7 @@ class App {
             Link.clear();
             Identifier.clear();
             $("[main]").hide();
-            React.render(<div />, $("[main].container").get(0));
+            ReactDOM.render(<div />, $("[main].container").get(0));
             this.welcome.show();
         };
 

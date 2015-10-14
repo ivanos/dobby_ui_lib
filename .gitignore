@@ -1,9 +1,7 @@
 
-
 .DS_Store
 .idea/
 
 node_modules/
-www/
 
-app/lib/
+npm-debug.log

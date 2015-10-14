@@ -9,6 +9,7 @@ import mainViewStore, {GRAPH_VIEW, COLUMN_VIEW} from "./stores/mainView";
 
 import {searchAction, searchStore} from "./actions/search";
 
+import React from "react";
 
 class Main extends React.Component {
 

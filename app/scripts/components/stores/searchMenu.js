@@ -1,5 +1,7 @@
 import {showSearchMenu, hideSearchMenu} from "../actions/searchMenu";
 
+import Reflux from "reflux";
+
 var searchMenuStore = Reflux.createStore({
     getInitialState() {
         return {

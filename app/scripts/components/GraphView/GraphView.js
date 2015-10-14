@@ -16,6 +16,10 @@ import {showSearchMenu, hideSearchMenu} from "../actions/searchMenu";
 import {setView} from "../actions/mainView";
 import {COLUMN_VIEW} from "../stores/mainView";
 
+import $ from "jquery";
+import React from "react";
+import ReactDOM from "react-dom";
+
 // ZoomFit button handler
 //$(() => {
 //    var $zoomFit = $(".reset-zoom")
@@ -56,7 +60,7 @@ var GraphView = React.createClass({
     },
 
     componentDidMount() {
-        var graph = new Graph($(React.findDOMNode(this.refs.graphContainer)));
+        var graph = new Graph($(ReactDOM.findDOMNode(this.refs.graphContainer)));
 
         this._addListeners(graph);
         this._updateGraph(graph);
@@ -256,7 +260,7 @@ var GraphView = React.createClass({
     _handleZoom(event) {
         event.preventDefault();
 
-        var {top, left} = React.findDOMNode(this).getBoundingClientRect(),
+        var {top, left} = ReactDOM.findDOMNode(this).getBoundingClientRect(),
 
             mouseY = event.clientY - top,
             mouseX = event.clientX - left,

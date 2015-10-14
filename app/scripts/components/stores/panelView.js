@@ -1,5 +1,7 @@
 import {hideLinkColumn, showLinkColumn} from "../actions/panelView";
 
+import Reflux from "reflux";
+
 var panelViewStore = Reflux.createStore({
     getInitialState() {
         return {
