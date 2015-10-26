@@ -26,11 +26,7 @@ Dobby UI is a web UI for inspecting Dobby.  It relies on the Dobby REST interfac
                   {branch, "master"}}, [raw]}]
  }.
 
-{pre_hooks, [{'get-deps', "sh -c 'npm --version >> /dev/null || (echo \"npm not installed\"; exit 1)'"}]}.
-
-{post_hooks, [{'get-deps', "sh -c 'cd deps/dobby_ui && npm install --unsafe-perm && cd -'"},
-              {compile,
-               "sh -c 'cp -r deps/dobby_ui/www deps/dobby_rest/priv/static'"}]}.
+{post_hooks, [{compile, "sh -c 'cp -r deps/dobby_ui_lib/www deps/dobby_rest/priv/static'"}]}.
 ```
 
 ## Usage
