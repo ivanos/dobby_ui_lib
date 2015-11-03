@@ -9,12 +9,11 @@ var appStateStore = Reflux.createStore({
 
     getInitialState() {
         return {
-            rootIdentifier: []
+            rootIdentifiers: []
         }
     },
 
     onSetRootIdentifiers(rootIdentifiers) {
-        console.log(arguments);
         this.trigger({rootIdentifiers});
     }
 

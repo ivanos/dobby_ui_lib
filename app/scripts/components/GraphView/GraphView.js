@@ -20,17 +20,9 @@ import $ from "jquery";
 import React from "react";
 import ReactDOM from "react-dom";
 
-// ZoomFit button handler
-//$(() => {
-//    var $zoomFit = $(".reset-zoom")
-//        .on("click", zoomFit);
-//
-//    zoomStore.listen((state) => {
-//        $zoomFit[state.isUserTransform ? "show" : "hide"]();
-//    });
-//});
+import { graphStore, searchGraph } from '../stores/dobbyGraphStore';
 
-// GraphView component
+
 var GraphView = React.createClass({
 
     getInitialState() {
@@ -74,30 +66,14 @@ var GraphView = React.createClass({
         this.unSearchMenuStore = searchMenuStore.listen((state) => {
             this.setState(state);
         });
+
+        this.unGraphStore = graphStore.listen((state) => {
+            this.setState(state);
+        });
     },
 
     _search(identifier, params={}) {
-        return identifier.search(params)
-            .then(this._onSearchSuccess);
-    },
-
-    _onSearchSuccess({identifiers, links}) {
-        var {nodes, edges} = this.state;
-        nodes = [...nodes];
-        edges = [...edges];
-
-        links = links.map((l) => {
-            return {
-                target: Identifier.get(l.target),
-                source: Identifier.get(l.source),
-                data: l
-            }
-        });
-
-        nodes.push(...identifiers);
-        edges.push(...links);
-
-        this.setState({nodes: new Set(nodes), edges: new Set(edges)})
+        searchGraph(identifier, params);
     },
 
     _dblClick(_, identifier) {
@@ -340,6 +316,8 @@ var GraphView = React.createClass({
 
         this.unZoomStore();
         this.unSearchMenuStore();
+        this.unGraphStore();
+
     }
 
 });
