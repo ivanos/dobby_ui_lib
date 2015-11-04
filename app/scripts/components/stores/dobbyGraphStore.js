@@ -131,6 +131,10 @@ export const panelStore = Reflux.createStore({
     init() {
         this.state = this.getInitialState();
         this.listenTo(storeUpdated, this.onStoreSearchUpdated);
+        this.listenTo(storeDataUpdated, () => {
+            this.trigger(this.state);
+        });
+
     },
 
     onStoreSearchUpdated(state, options, results = null) {
