@@ -3,6 +3,11 @@
 import Reflux from "reflux";
 import Identifier from '../../model/Identifier';
 
+import { setRootIdentifiers } from '../actions/application';
+
+import Monitor from '../../model/Monitor';
+
+
 export const PANEL_SEARCH = Symbol("PANEL_SEARCH");
 export const GRAPH_SEARCH = Symbol("GRAPH_SEARCH");
 export const DEFAULT_SEARCH = Symbol("DEFAULT_SEARCH");
@@ -27,27 +32,51 @@ search.listen((identifier, params, options) => {
 
 var storeUpdated = Reflux.createAction();
 
+var storeDataUpdated = Reflux.createAction();
+
+let updateMetadata = Reflux.createAction();
+
+// TODO: This is for demo only
+window.updateMetadata = updateMetadata;
+
 export const globalStore = Reflux.createStore({
     getInitialState() {
         return {
-            nodes: [],
-            edges: []
+            nodes: new Set(),
+            edges: new Set()
         }
     },
 
     init() {
-
         this.state = this.getInitialState();
-
         this.listenTo(search.completed, this.onSearchCompleted);
-        //this.listenTo(searchPanel, this.onSearch.bind(this, GRAPH_SEARCH));
+        this.listenTo(updateMetadata, this.onMetadataUpdate);
+        this.listenTo(setRootIdentifiers, this.setRootIdentifiers);
+
+        this.monitor = new Monitor();
+    },
+
+    setRootIdentifiers(identifiers) {
+        this.state = { nodes: new Set(identifiers), edges: new Set() };
+        this._startMonitoring(identifiers);
+        storeUpdated(this.state, {context: DEFAULT_SEARCH}, null);
+    },
+
+    onMetadataUpdate(identifier, metadata) {
+        identifier.metadata = metadata;
+        storeDataUpdated(this.state);
     },
 
     onSearchCompleted(options, result) {
         this.state = this._onSearchCompleted(result);
-        console.log(options);
+        storeUpdated(this.state, options, result);
+    },
 
-        storeUpdated(options, this.state, result);
+    _startMonitoring(identifiers) {
+        this.monitor.listen(identifiers.map(i => i.name), i => {
+            //Identifier.get(i.identifier);
+            //console.log("monitoring", i);
+        });
     },
 
     _onSearchCompleted({ identifiers, links }) {
@@ -66,7 +95,7 @@ export const globalStore = Reflux.createStore({
         nodes.push(...identifiers);
         edges.push(...links);
 
-        // TODO: hold only ids
+        this._startMonitoring(identifiers);
 
         return { nodes: new Set(nodes), edges: new Set(edges) };
     }
@@ -75,17 +104,19 @@ export const globalStore = Reflux.createStore({
 
 export const graphStore = Reflux.createStore({
     getInitialState() {
-        return {
-            nodes: [],
-            edges: []
-        }
+        return globalStore.state;
+        //return {
+        //    nodes: [],
+        //    edges: []
+        //}
     },
 
     init() {
         this.listenTo(storeUpdated, this.onStoreUpdated);
+        this.listenTo(storeDataUpdated, this.onStoreUpdated);
     },
 
-    onStoreUpdated(options, state, results) {
+    onStoreUpdated(state, options, results) {
         this.trigger(state);
     }
 });
@@ -102,7 +133,7 @@ export const panelStore = Reflux.createStore({
         this.listenTo(storeUpdated, this.onStoreSearchUpdated);
     },
 
-    onStoreSearchUpdated(options, state, results = null) {
+    onStoreSearchUpdated(state, options, results = null) {
         if (options.context === PANEL_SEARCH) {
             let items = this.state.items.slice(0, options.columnIndex);
             Promise.resolve(results)
@@ -155,5 +186,3 @@ export const panelStore = Reflux.createStore({
         return {identifier, neighbours};
     }
 });
-
-

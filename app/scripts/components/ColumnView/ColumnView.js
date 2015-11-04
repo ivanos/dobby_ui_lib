@@ -12,8 +12,9 @@ import { identifierSelect, panelStore } from '../stores/dobbyGraphStore';
 var ColumnView = React.createClass({
 
     getInitialState() {
+        let panelStoreInitialState = panelStore.getInitialState();
         return {
-            items: [],
+            ...panelStoreInitialState,
             isLinksVisible: panelViewStore.getInitialState().isLinksVisible
         }
     },

@@ -1,6 +1,3 @@
-
-import Metadata from "./Metadata";
-
 import Link from "./Link";
 
 import {
@@ -13,7 +10,7 @@ var {createLink} = Link;
 class Identifier {
     constructor(name, metadata) {
         this.name = name;
-        this.metadata = new Metadata(metadata);
+        this.metadata = metadata;
     }
 
     links() {
@@ -69,6 +66,7 @@ class Identifier {
 
 var identifiers = new Map();
 
+
 function get(name) {
     return identifiers.get(name);
 }
@@ -90,6 +88,9 @@ function find(name) {
     return GET(`/identifier/${encodeURIComponent(name)}`)
         .then(createIdentifier, handleError);
 }
+
+// TODO: This is for demo only
+window.getIdentifier = get;
 
 export default {
     createIdentifier,

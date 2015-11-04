@@ -27,11 +27,10 @@ var GraphView = React.createClass({
 
     getInitialState() {
         var zoomStoreState = zoomStore.getInitialState(),
-            searchStoreState = searchMenuStore.getInitialState();
+            searchStoreState = searchMenuStore.getInitialState(),
+            graphStoreState = graphStore.getInitialState();
 
         return {
-            nodes: new Set(this.props.identifiers),
-            edges: new Set(),
 
             //searchMenuPosition: null,
             //searchIdentifier: null,
@@ -39,7 +38,8 @@ var GraphView = React.createClass({
             hoveredLink: null,
             hoveredIdentifier: null,
             ...zoomStoreState,
-            ...searchStoreState
+            ...searchStoreState,
+            ...graphStoreState
         }
     },
 
@@ -58,6 +58,7 @@ var GraphView = React.createClass({
         this._updateGraph(graph);
 
         this.graph = graph;
+
 
         this.unZoomStore = zoomStore.listen((state) => {
             this.setState(state);

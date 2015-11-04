@@ -1,12 +1,10 @@
-
-import Metadata from "./Metadata";
 import Identifier from "./Identifier"
 
 class Link {
     constructor(source, target, metadata) {
         this.source = source;
         this.target = target;
-        this.metadata = new Metadata(metadata);
+        this.metadata = metadata;
     }
 
     identifiers() {

@@ -39,7 +39,6 @@ class Main extends React.Component {
                 <div style={{flex: 1, display: this.state.currentView === GRAPH_VIEW ? "flex" : "none"}}>
                     <GraphView
                         ref="graph"
-                        identifiers={this.props.identifiers}
                         isRunning={this.state.currentView === GRAPH_VIEW}
                     />
                 </div>

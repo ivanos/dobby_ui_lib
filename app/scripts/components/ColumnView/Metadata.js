@@ -5,13 +5,14 @@ var Metadata = React.createClass({
     render() {
         var {data, className, ...props} = this.props;
 
-        var metadataItems = (data ? data.entries().map(([__key, value]) => {
+        var metadataItems = (data ? Object.keys(data).map(key => {
+                let value = data[key];
                 return {
-                    __key,
+                    __key: key,
                     ...value
                 };
             }) : []).map((metadataItem) => {
-                return (<MetadataItem item={metadataItem}/>)
+                return (<MetadataItem key={metadataItem.__key} item={metadataItem}/>)
             });
 
 

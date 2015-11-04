@@ -2,9 +2,10 @@ import React from "react";
 
 var Link = React.createClass({
     render() {
-        var {link, ...props} = this.props;
+        let {link, ...props} = this.props;
+        let type = link.metadata['type'] ? link.metadata['type'].value : "undefined";
         return (
-            <div {...props}>{link.metadata.get("type")}</div>
+            <div {...props}>{type}</div>
         )
     }
 });
