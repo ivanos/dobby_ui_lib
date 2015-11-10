@@ -7,7 +7,7 @@
     border-top: 5px solid $primary;
 
     box-sizing: border-box;
-    box-shadow: 0 0 5px transparentize($background, .2);
+    box-shadow: 0 0 5px rgba(50, 50, 50, .8);
 }
 
 .card > :last-child {

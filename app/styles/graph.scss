@@ -1,7 +1,7 @@
 
 .node ellipse {
   fill: $graph-primary;
-  stroke: $graph-primary;
+  stroke: $graph-line;
   /*fill: rgba(255,255,255,.6);*/
 }
 
@@ -21,7 +21,7 @@
 }
 
 .link {
-  stroke: $graph-primary;
+  stroke: $graph-line;
   stroke-width: 1;
 }
 
