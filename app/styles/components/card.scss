@@ -1,0 +1,15 @@
+
+.card {
+    border-radius: 5px;
+    background-color: $background-secondary;
+    padding: 16px;
+    color: $font-primary;
+    border-top: 5px solid $primary;
+
+    box-sizing: border-box;
+    box-shadow: 0 0 5px transparentize($background, .2);
+}
+
+.card > :last-child {
+    margin-bottom: 0;
+}

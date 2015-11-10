@@ -1,7 +1,7 @@
 // Import polyfill
 import 'babel-core/polyfill';
 import 'reset.css/reset.css';
-import './app.css';
+import './app.scss';
 
 
 import $ from "jquery";
@@ -15,12 +15,12 @@ import Identifier from "./scripts/model/Identifier";
 import Link from "./scripts/model/Link";
 import Header from "./scripts/components/Header";
 import appStateStore from "./scripts/components/stores/application";
-import {setRootIdentifiers} from "./scripts/components/actions/application";
+import { setRootIdentifiers } from "./scripts/components/actions/application";
 
 $(() => {
 
-    $("[welcome]").hide();
-    $("[main]").hide();
+    //$("[welcome]").hide();
+    //$("[main]").hide();
 
     var app = new App();
 });

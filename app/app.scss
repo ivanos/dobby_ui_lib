@@ -1,0 +1,55 @@
+body {
+    & {
+        @import 'styles/colors';
+        @import "styles/components/components.scss";
+        @import "styles/ColumnView";
+        @import "styles/graph";
+    }
+    &.light {
+        @import 'styles/colors-light';
+        @import "styles/components/components.scss";
+        @import "styles/ColumnView";
+        @import "styles/graph";
+    }
+
+}
+
+.error {
+    color: lightcoral;
+}
+
+
+[main] {
+    overflow: hidden;
+}
+
+.main-container svg {
+    flex: 1;
+}
+
+.main-container {
+    position: relative;
+}
+
+ul {
+    margin-left: 10px;
+}
+
+.main-container {
+    align-items: stretch;
+    flex: 1;
+    align-self: stretch;
+    display: flex;
+}
+
+.hidden {
+    display: none;
+}
+
+.tooltip-title-text {
+    text-transform: none;
+}
+
+pre.matadata-value {
+   display: inline;
+}
