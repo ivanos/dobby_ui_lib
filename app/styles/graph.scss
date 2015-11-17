@@ -1,0 +1,35 @@
+
+.node ellipse {
+  fill: $graph-primary;
+  stroke: $graph-line;
+  /*fill: rgba(255,255,255,.6);*/
+}
+
+.node.over ellipse {
+  fill: $graph-primary;
+  stroke: $graph-secondary;
+  stroke-width: 3px;
+}
+
+.node.over.main ellipse {
+  fill: $graph-secondary;
+}
+
+.node.over.main text {
+  //stroke: #FFFFFF;
+  fill: $font-primary;
+}
+
+.link {
+  stroke: $graph-line;
+  stroke-width: 1;
+}
+
+.link.over {
+  stroke: $graph-secondary;
+  stroke-width: 2;
+}
+
+.no-link-caption .link > .link-caption {
+  display: none;
+}

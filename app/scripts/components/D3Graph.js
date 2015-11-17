@@ -78,7 +78,10 @@ class D3Graph extends Graph {
                 .each(collide(1))
                 .attr("transform", function(d) { return `translate(${d.x}, ${d.y})`;});
 
-            containerEl.selectAll(".link").attr("x1", function(d) { return d.source.x; })
+            containerEl.selectAll(".link > text").attr("x", function(d) { return (d.source.x + d.target.x)/2; })
+                .attr("y", function(d) { return (d.source.y + d.target.y)/2; });
+
+            containerEl.selectAll(".link > line").attr("x1", function(d) { return d.source.x; })
                 .attr("y1", function(d) { return d.source.y; })
                 .attr("x2", function(d) { return d.target.x; })
                 .attr("y2", function(d) { return d.target.y; });
@@ -251,7 +254,7 @@ class D3Graph extends Graph {
 
         link.exit().remove();
 
-        link.enter().insert("line", ":first-child")
+        let linkContainer = link.enter().insert("g", ":first-child")
             .attr("class", "link")
             .on("mouseover", (d) => {
                 $(this).trigger("overEdge", d.data);
@@ -261,9 +264,15 @@ class D3Graph extends Graph {
             })
             .attr("stroke", "#FFF");
 
-        console.log(width, height);
+        linkContainer
+            .append("line");
 
-        // refresh force
+        linkContainer
+            .append("text")
+            .text(d => {
+                return d.data.metadata.type.value;
+            })
+            .attr("class", "link-caption");
     }
 
     transform(scale, {offsetX, offsetY}) {

@@ -39,7 +39,6 @@ class Main extends React.Component {
                 <div style={{flex: 1, display: this.state.currentView === GRAPH_VIEW ? "flex" : "none"}}>
                     <GraphView
                         ref="graph"
-                        identifiers={this.props.identifiers}
                         isRunning={this.state.currentView === GRAPH_VIEW}
                     />
                 </div>
@@ -48,9 +47,11 @@ class Main extends React.Component {
                         key={this.state.panelViewRoots[0].name}
                         identifiers={this.state.panelViewRoots}
                         onSearchResults={(res) => {
+                            // TODO: get rid of this
                             this.refs.graph._onSearchSuccess(res);
                         }}
                         onIdentifierSelected={(identifier) => {
+                            // TODO: get rid of this
                             this.refs.graph.hoverIdentifier(identifier);
                         }}
                     />

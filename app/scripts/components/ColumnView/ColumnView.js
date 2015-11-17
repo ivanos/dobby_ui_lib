@@ -7,87 +7,40 @@ import $ from "jquery";
 import React from "react";
 import ReactDOM from "react-dom";
 
+import { identifierSelect, panelStore } from '../stores/dobbyGraphStore';
+
 var ColumnView = React.createClass({
 
     getInitialState() {
+        let panelStoreInitialState = panelStore.getInitialState();
         return {
-            items: [],
+            ...panelStoreInitialState,
             isLinksVisible: panelViewStore.getInitialState().isLinksVisible
         }
-    },
-
-    _sortResults({identifier, identifiers, links}) {
-        identifiers = identifiers.sort((i1, i2) => i1.name.localeCompare(i2.name));
-        links = links.sort((i1, i2) => {
-            var name = identifier.name;
-            // TODO: rewrite in elegant and robust way
-            // sorting links by identifiers name
-            if (name === i1.target && name === i2.target) {
-                return i1.source.localeCompare(i2.source);
-            } else if (name === i1.source && name === i2.source) {
-                return i1.target.localeCompare(i2.target);
-            } else if (name === i1.source && name === i2.target) {
-                return i1.target.localeCompare(i2.source);
-            } else if (name === i1.target && name === i2.source) {
-                return i1.source.localeCompare(i2.target);
-            }
-
-        });
-
-        return {identifier, identifiers, links}
-    },
-
-    _removeIdentifierFromResult(identifier) {
-        return ({identifiers, links}) => {
-            var identifiersSet = new Set(identifiers);
-            identifiersSet.delete(identifier);
-            return {identifiers: Array.from(identifiersSet), links}
-        }
-    },
-
-    _mapResults({identifier, identifiers, links}) {
-        var neighbours = identifiers.map((identifier, index) => {
-            return {identifier, link: links[index]}
-        });
-
-        return {identifier, neighbours};
     },
 
     componentDidMount() {
         this.unPanelViewStore = panelViewStore.listen(({isLinksVisible}) => {
             this.setState({isLinksVisible});
         });
-        //this._identifierSelect(this.props.identifier);
-        //this.refs.root.select(this.props.identifier);
+
+        this.unPanelStore = panelStore.listen(state => {
+            this.setState(state);
+
+            var $scroll = $(ReactDOM.findDOMNode(this.refs.scroll));
+            $scroll.animate({scrollLeft: $scroll.prop("scrollWidth")}, 500);
+
+        });
     },
 
     componentWillUnmount() {
         this.unPanelViewStore();
-    },
-
-    search(identifier) {
-        return identifier.search({})
-            .then((result) => {
-                this.props.onSearchResults(result);
-                return result;
-            })
-            .then(this._removeIdentifierFromResult(identifier))
-            .then(({identifiers, links}) => {return {identifier, identifiers, links}})
-            .then(this._sortResults)
-            .then(this._mapResults);
+        this.unPanelStore();
     },
 
     _identifierSelect(identifier, index=0) {
-        var items = this.state.items.slice(0, index);
         this.props.onIdentifierSelected(identifier);
-        this.search(identifier)
-            .then((results) => {
-                items.push(results);
-                this.setState({items});
-
-                var $scroll = $(ReactDOM.findDOMNode(this.refs.scroll));
-                $scroll.animate({scrollLeft: $scroll.prop("scrollWidth")}, 500);
-            });
+        identifierSelect(identifier, index);
     },
 
     render() {
