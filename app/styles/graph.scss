@@ -29,3 +29,7 @@
   stroke: $graph-secondary;
   stroke-width: 2;
 }
+
+.no-link-caption .link > .link-caption {
+  display: none;
+}

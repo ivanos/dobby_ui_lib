@@ -21,6 +21,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import { graphStore, searchGraph } from '../stores/dobbyGraphStore';
+import graphViewStore from '../stores/graphView';
 
 
 var GraphView = React.createClass({
@@ -39,7 +40,9 @@ var GraphView = React.createClass({
             hoveredIdentifier: null,
             ...zoomStoreState,
             ...searchStoreState,
-            ...graphStoreState
+            ...graphStoreState,
+
+            isGraphLinksVisible: graphViewStore.getInitialState().isGraphLinksVisible
         }
     },
 
@@ -70,6 +73,10 @@ var GraphView = React.createClass({
 
         this.unGraphStore = graphStore.listen((state) => {
             this.setState(state);
+        });
+
+        this.unGraphViewStore = graphViewStore.listen(({ isGraphLinksVisible }) => {
+            this.setState({ isGraphLinksVisible })
         });
     },
 
@@ -209,6 +216,7 @@ var GraphView = React.createClass({
         return (
             <div
                 style={{flex: 1, display: "flex", alignItems: "stretch"}}
+                className={!this.state.isGraphLinksVisible && "no-link-caption"}
             >
                 <div
                     onWheel={this._handleZoom}
@@ -318,6 +326,8 @@ var GraphView = React.createClass({
         this.unZoomStore();
         this.unSearchMenuStore();
         this.unGraphStore();
+
+        this.unGraphViewStore();
 
     }
 
