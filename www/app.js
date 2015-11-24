@@ -35320,46 +35320,33 @@
 	            this.graph.nodes = [].concat(_toConsumableArray(this.nodesMap.values()));
 	            this.graph.edges = [].concat(_toConsumableArray(this.edgesMap.values()));
 	        }
-	
-	        // TODO: change to setNodes
 	    }, {
-	        key: "addNodes",
-	        value: function addNodes(nodes) {
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
+	        key: "setNodes",
+	        value: function setNodes(nodes) {
+	            var _this = this;
 	
-	            try {
-	                for (var _iterator = nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                    var data = _step.value;
+	            var newNodes = [].concat(_toConsumableArray(nodes)).filter(function (n) {
+	                return !_this.nodesMap.has(n);
+	            });
+	            var nodesToRemove = [].concat(_toConsumableArray(this.nodesMap.keys())).filter(function (n) {
+	                return !nodes.has(n);
+	            });
 	
-	                    if (this.nodesMap.get(data)) {
-	                        continue;
-	                    }
-	                    var node = new Node(data, data.id || i++);
-	                    this.nodesMap.set(data, node);
-	                }
-	            } catch (err) {
-	                _didIteratorError = true;
-	                _iteratorError = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion && _iterator["return"]) {
-	                        _iterator["return"]();
-	                    }
-	                } finally {
-	                    if (_didIteratorError) {
-	                        throw _iteratorError;
-	                    }
-	                }
-	            }
+	            newNodes.forEach(function (data) {
+	                var node = new Node(data, data.id || i++);
+	                _this.nodesMap.set(data, node);
+	            });
+	
+	            nodesToRemove.forEach(function (node) {
+	                _this.nodesMap["delete"](node);
+	            });
 	
 	            this.refreshGraphData();
 	        }
 	    }, {
 	        key: "addNode",
 	        value: function addNode(data) {
-	            this.addNodes([data]);
+	            this.setNodes([data]);
 	        }
 	    }, {
 	        key: "createEdge",
@@ -35374,51 +35361,44 @@
 	
 	            return new Edge(sourceId, targetId, data);
 	        }
-	
-	        // TODO: change to setEdges
 	    }, {
-	        key: "addEdges",
-	        value: function addEdges(edges) {
-	            var _iteratorNormalCompletion2 = true;
-	            var _didIteratorError2 = false;
-	            var _iteratorError2 = undefined;
+	        key: "setEdges",
+	        value: function setEdges(edges) {
+	            var _this2 = this;
 	
-	            try {
-	                for (var _iterator2 = edges[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                    var _step2$value = _step2.value;
-	                    var source = _step2$value.source;
-	                    var target = _step2$value.target;
-	                    var data = _step2$value.data;
+	            var links = new Set([].concat(_toConsumableArray(edges)).map(function (_ref) {
+	                var data = _ref.data;
+	                return data;
+	            }));
+	            var newEdges = [].concat(_toConsumableArray(edges)).filter(function (_ref2) {
+	                var data = _ref2.data;
+	                return !_this2.edgesMap.has(data);
+	            });
+	            var edgesToRemove = [].concat(_toConsumableArray(this.edgesMap.keys())).filter(function (edge) {
+	                return !links.has(edge);
+	            });
 	
-	                    if (this.edgesMap.get(data)) {
-	                        continue;
-	                    }
+	            console.log(edges, newEdges, edgesToRemove);
 	
-	                    var edge = this.createEdge(source, target, data);
+	            newEdges.forEach(function (_ref3) {
+	                var source = _ref3.source;
+	                var target = _ref3.target;
+	                var data = _ref3.data;
 	
-	                    this.edgesMap.set(data, edge);
-	                }
-	            } catch (err) {
-	                _didIteratorError2 = true;
-	                _iteratorError2 = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion2 && _iterator2["return"]) {
-	                        _iterator2["return"]();
-	                    }
-	                } finally {
-	                    if (_didIteratorError2) {
-	                        throw _iteratorError2;
-	                    }
-	                }
-	            }
+	                var edge = _this2.createEdge(source, target, data);
+	                _this2.edgesMap.set(data, edge);
+	            });
+	
+	            edgesToRemove.forEach(function (edge) {
+	                _this2.edgesMap["delete"](edge);
+	            });
 	
 	            this.refreshGraphData();
 	        }
 	    }, {
 	        key: "addEdge",
 	        value: function addEdge(sourceNode, targetNode, data) {
-	            this.addEdges([{ sourceNode: sourceNode, targetNode: targetNode, data: data }]);
+	            this.setEdges([{ sourceNode: sourceNode, targetNode: targetNode, data: data }]);
 	        }
 	    }]);
 	
@@ -47646,12 +47626,39 @@
 	        storeUpdated(this.state, options, result);
 	    },
 	
+	    onIdentifierDelete: function onIdentifierDelete(identifier) {
+	        var nodes = this.state.nodes;
+	        var edges = this.state.edges;
+	
+	        nodes['delete'](identifier);
+	        edges = [].concat(_toConsumableArray(edges)).filter(function (edge) {
+	            return edge.source !== identifier && edge.target !== identifier;
+	        });
+	
+	        this.state = {
+	            edges: new Set(edges),
+	            nodes: nodes
+	        };
+	        storeDataUpdated(this.state);
+	
+	        this._stopMonitoring([identifier]);
+	    },
+	
+	    _stopMonitoring: function _stopMonitoring(identifiers) {
+	        console.warn("not implemented");
+	    },
+	
 	    _startMonitoring: function _startMonitoring(identifiers) {
+	        var _this = this;
+	
 	        this.monitor.listen(identifiers.map(function (i) {
 	            return i.name;
 	        }), function (i) {
-	            //Identifier.get(i.identifier);
-	            //console.log("monitoring", i);
+	            var identifier = _modelIdentifier2['default'].get(i.identifier);
+	            identifier.metadata = i.metadata;
+	
+	            //this.onMetadataUpdate(identifier, i.metadata);
+	            _this.onIdentifierDelete(identifier);
 	        });
 	    },
 	
@@ -47701,6 +47708,7 @@
 	    },
 	
 	    onStoreUpdated: function onStoreUpdated(state, options, results) {
+	        console.log(state);
 	        this.trigger(state);
 	    }
 	});
@@ -47714,31 +47722,31 @@
 	    },
 	
 	    init: function init() {
-	        var _this = this;
+	        var _this2 = this;
 	
 	        this.state = this.getInitialState();
 	        this.listenTo(storeUpdated, this.onStoreSearchUpdated);
 	        this.listenTo(storeDataUpdated, function () {
-	            _this.trigger(_this.state);
+	            _this2.trigger(_this2.state);
 	        });
 	    },
 	
 	    onStoreSearchUpdated: function onStoreSearchUpdated(state, options) {
-	        var _this2 = this;
+	        var _this3 = this;
 	
 	        var results = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	
 	        if (options.context === PANEL_SEARCH) {
 	            (function () {
-	                var items = _this2.state.items.slice(0, options.columnIndex);
-	                Promise.resolve(results).then(_this2._removeIdentifierFromResult(options.identifier)).then(function (_ref2) {
+	                var items = _this3.state.items.slice(0, options.columnIndex);
+	                Promise.resolve(results).then(_this3._removeIdentifierFromResult(options.identifier)).then(function (_ref2) {
 	                    var identifiers = _ref2.identifiers;
 	                    var links = _ref2.links;
 	                    return { identifier: options.identifier, identifiers: identifiers, links: links };
-	                }).then(_this2._sortResults).then(_this2._mapResults).then(function (results) {
+	                }).then(_this3._sortResults).then(_this3._mapResults).then(function (results) {
 	                    items.push(results);
-	                    _this2.state = { items: items };
-	                    _this2.trigger(_this2.state);
+	                    _this3.state = { items: items };
+	                    _this3.trigger(_this3.state);
 	                });
 	            })();
 	        }
@@ -47828,15 +47836,21 @@
 
 	/* REACT HOT LOADER */ if (false) { (function () { var ReactHotAPI = require("/Users/kozorezal/Projects/infoblox/dobby/dobby_ui/node_modules/react-hot-loader/node_modules/react-hot-api/modules/index.js"), RootInstanceProvider = require("/Users/kozorezal/Projects/infoblox/dobby/dobby_ui/node_modules/react-hot-loader/RootInstanceProvider.js"), ReactMount = require("react/lib/ReactMount"), React = require("react"); module.makeHot = module.hot.data ? module.hot.data.makeHot : ReactHotAPI(function () { return RootInstanceProvider.getRootInstances(ReactMount); }, React); })(); } try { (function () {
 	
-	"use strict";
+	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var TYPE_EVENT = 'event';
+	var TYPE_RESPONSE = 'response';
+	
+	var CREATE_EVENT = 'create';
+	var DELETE_EVENT = 'delete';
 	
 	var DobbyMonitor = (function () {
 	    function DobbyMonitor() {
@@ -47846,7 +47860,7 @@
 	    }
 	
 	    _createClass(DobbyMonitor, [{
-	        key: "openConnection",
+	        key: 'openConnection',
 	        value: function openConnection() {
 	            var _this = this;
 	
@@ -47862,27 +47876,30 @@
 	                    resolve(ws);
 	                };
 	
+	                ws.onclose = function () {
+	                    _this.connection = null;
+	                };
+	
 	                ws.onmessage = function (_ref) {
 	                    var data = _ref.data;
 	
 	                    var json = JSON.parse(data);
-	                    json.response.state.forEach(function (i) {
-	                        if (i.identifier) {
-	                            // TODO: think what to do with it.
-	                            i.identifier = decodeURIComponent(i.identifier);
-	                            var callback = _this.callbacks.get(i.identifier);
-	                            if (callback) {
-	                                callback(i);
-	                            }
+	                    if (json.type === TYPE_EVENT && json.event === CREATE_EVENT) {
+	                        var identifier = json.message;
+	                        identifier.identifier = decodeURIComponent(identifier.identifier);
+	                        var callback = _this.callbacks.get(identifier.identifier);
+	                        if (callback) {
+	                            console.log(identifier);
+	                            callback(identifier);
 	                        }
-	                    });
+	                    }
 	                };
 	            });
 	
 	            return this.connection;
 	        }
 	    }, {
-	        key: "_registerCallback",
+	        key: '_registerCallback',
 	        value: function _registerCallback(identifiers, changeCallback) {
 	            var _this2 = this;
 	
@@ -47891,7 +47908,7 @@
 	            });
 	        }
 	    }, {
-	        key: "_send",
+	        key: '_send',
 	        value: function _send(payload) {
 	            this.openConnection().then(function (ws) {
 	                ws.send(JSON.stringify(payload));
@@ -47904,7 +47921,7 @@
 	         * @param changeCallback callback which will be executed on identifier change
 	         */
 	    }, {
-	        key: "listen",
+	        key: 'listen',
 	        value: function listen(identifiers, changeCallback) {
 	            this._registerCallback(identifiers, changeCallback);
 	            this._send({
@@ -47921,8 +47938,8 @@
 	    return DobbyMonitor;
 	})();
 	
-	exports["default"] = DobbyMonitor;
-	module.exports = exports["default"];
+	exports['default'] = DobbyMonitor;
+	module.exports = exports['default'];
 
 	/* REACT HOT LOADER */ }).call(this); } finally { if (false) { (function () { var foundReactClasses = module.hot.data && module.hot.data.foundReactClasses || false; if (module.exports && module.makeHot) { var makeExportsHot = require("/Users/kozorezal/Projects/infoblox/dobby/dobby_ui/node_modules/react-hot-loader/makeExportsHot.js"); if (makeExportsHot(module, require("react"))) { foundReactClasses = true; } var shouldAcceptModule = true && foundReactClasses; if (shouldAcceptModule) { module.hot.accept(function (err) { if (err) { console.error("Cannot not apply hot update to " + "Monitor.js" + ": " + err.message); } }); } } module.hot.dispose(function (data) { data.makeHot = module.makeHot; data.foundReactClasses = foundReactClasses; }); })(); } }
 
@@ -48095,8 +48112,8 @@
 	    },
 	
 	    _updateGraph: function _updateGraph(graph) {
-	        graph.addNodes(this.state.nodes);
-	        graph.addEdges(this.state.edges);
+	        graph.setNodes(this.state.nodes);
+	        graph.setEdges(this.state.edges);
 	    },
 	
 	    _highlightGraph: function _highlightGraph(graph) {
@@ -48343,6 +48360,8 @@
 	        this.unZoomStore();
 	        this.unSearchMenuStore();
 	        this.unGraphStore();
+	
+	        this.unGraphViewStore();
 	    }
 	
 	});

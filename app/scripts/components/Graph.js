@@ -20,19 +20,24 @@ class Graph extends Component {
         this.graph.edges = [...this.edgesMap.values()];
     }
 
-    // TODO: change to setNodes
-    addNodes(nodes) {
-        for (let data of nodes) {
-            if (this.nodesMap.get(data)) {continue;}
+    setNodes(nodes) {
+        let newNodes = [...nodes].filter(n => !this.nodesMap.has(n));
+        let nodesToRemove = [...this.nodesMap.keys()].filter(n => !nodes.has(n));
+
+        newNodes.forEach(data => {
             let node = new Node(data, data.id || i++);
             this.nodesMap.set(data, node);
-        }
+        });
+
+        nodesToRemove.forEach(node => {
+            this.nodesMap.delete(node);
+        });
 
         this.refreshGraphData();
     }
 
     addNode(data) {
-        this.addNodes([data]);
+        this.setNodes([data]);
     }
 
     createEdge(source, target, data) {
@@ -42,21 +47,27 @@ class Graph extends Component {
         return new Edge(sourceId, targetId, data);
     }
 
-    // TODO: change to setEdges
-    addEdges(edges) {
-        for (let {source, target, data} of edges) {
-            if (this.edgesMap.get(data)) {continue;}
+    setEdges(edges) {
+        let links = new Set([...edges].map(({data}) => data));
+        let newEdges = [...edges].filter(({data}) => !this.edgesMap.has(data));
+        let edgesToRemove = [...this.edgesMap.keys()].filter(edge => !links.has(edge));
 
+        console.log(edges, newEdges, edgesToRemove);
+
+        newEdges.forEach(({source, target, data}) => {
             var edge = this.createEdge(source, target, data);
-
             this.edgesMap.set(data, edge);
-        }
+        });
+
+        edgesToRemove.forEach(edge => {
+            this.edgesMap.delete(edge);
+        });
 
         this.refreshGraphData();
     }
 
     addEdge(sourceNode, targetNode, data) {
-        this.addEdges([{sourceNode, targetNode, data}]);
+        this.setEdges([{sourceNode, targetNode, data}]);
     }
 }
 

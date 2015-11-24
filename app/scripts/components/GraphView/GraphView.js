@@ -113,8 +113,8 @@ var GraphView = React.createClass({
     },
 
     _updateGraph(graph) {
-        graph.addNodes(this.state.nodes);
-        graph.addEdges(this.state.edges);
+        graph.setNodes(this.state.nodes);
+        graph.setEdges(this.state.edges);
     },
 
     _highlightGraph(graph) {

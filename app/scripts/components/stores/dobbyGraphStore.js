@@ -72,10 +72,35 @@ export const globalStore = Reflux.createStore({
         storeUpdated(this.state, options, result);
     },
 
+    onIdentifierDelete(identifier) {
+        let nodes = this.state.nodes;
+        let edges = this.state.edges;
+
+        nodes.delete(identifier);
+        edges = [...edges].filter((edge) => {
+            return edge.source !== identifier && edge.target !== identifier
+        });
+
+        this.state = {
+            edges: new Set(edges),
+            nodes
+        };
+        storeDataUpdated(this.state);
+
+        this._stopMonitoring([identifier]);
+    },
+
+    _stopMonitoring(identifiers) {
+        console.warn("not implemented");
+    },
+
     _startMonitoring(identifiers) {
         this.monitor.listen(identifiers.map(i => i.name), i => {
-            //Identifier.get(i.identifier);
-            //console.log("monitoring", i);
+            let identifier = Identifier.get(i.identifier);
+            identifier.metadata = i.metadata;
+
+            //this.onMetadataUpdate(identifier, i.metadata);
+            this.onIdentifierDelete(identifier);
         });
     },
 
@@ -117,6 +142,7 @@ export const graphStore = Reflux.createStore({
     },
 
     onStoreUpdated(state, options, results) {
+        console.log(state);
         this.trigger(state);
     }
 });
