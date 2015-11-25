@@ -47653,12 +47653,20 @@
 	
 	        this.monitor.listen(identifiers.map(function (i) {
 	            return i.name;
-	        }), function (i) {
+	        }), function (event, i) {
 	            var identifier = _modelIdentifier2['default'].get(i.identifier);
 	            identifier.metadata = i.metadata;
 	
-	            //this.onMetadataUpdate(identifier, i.metadata);
-	            _this.onIdentifierDelete(identifier);
+	            switch (event) {
+	                case _modelMonitor.CHANGE_EVENT:
+	                    _this.onMetadataUpdate(identifier, i.metadata);
+	                    break;
+	                case _modelMonitor.DELETE_EVENT:
+	                    _this.onIdentifierDelete(identifier);
+	                    break;
+	                default:
+	                    console.warn("Undefined monitor event");
+	            }
 	        });
 	    },
 	
@@ -47850,7 +47858,12 @@
 	var TYPE_RESPONSE = 'response';
 	
 	var CREATE_EVENT = 'create';
+	exports.CREATE_EVENT = CREATE_EVENT;
+	var CHANGE_EVENT = 'create';
+	exports.CHANGE_EVENT = CHANGE_EVENT;
 	var DELETE_EVENT = 'delete';
+	
+	exports.DELETE_EVENT = DELETE_EVENT;
 	
 	var DobbyMonitor = (function () {
 	    function DobbyMonitor() {
@@ -47884,13 +47897,12 @@
 	                    var data = _ref.data;
 	
 	                    var json = JSON.parse(data);
-	                    if (json.type === TYPE_EVENT && json.event === CREATE_EVENT) {
+	                    if (json.type === TYPE_EVENT) {
 	                        var identifier = json.message;
 	                        identifier.identifier = decodeURIComponent(identifier.identifier);
 	                        var callback = _this.callbacks.get(identifier.identifier);
 	                        if (callback) {
-	                            console.log(identifier);
-	                            callback(identifier);
+	                            callback(json.event, identifier);
 	                        }
 	                    }
 	                };
@@ -47939,8 +47951,7 @@
 	})();
 	
 	exports['default'] = DobbyMonitor;
-	module.exports = exports['default'];
-
+	
 	/* REACT HOT LOADER */ }).call(this); } finally { if (false) { (function () { var foundReactClasses = module.hot.data && module.hot.data.foundReactClasses || false; if (module.exports && module.makeHot) { var makeExportsHot = require("/Users/kozorezal/Projects/infoblox/dobby/dobby_ui/node_modules/react-hot-loader/makeExportsHot.js"); if (makeExportsHot(module, require("react"))) { foundReactClasses = true; } var shouldAcceptModule = true && foundReactClasses; if (shouldAcceptModule) { module.hot.accept(function (err) { if (err) { console.error("Cannot not apply hot update to " + "Monitor.js" + ": " + err.message); } }); } } module.hot.dispose(function (data) { data.makeHot = module.makeHot; data.foundReactClasses = foundReactClasses; }); })(); } }
 
 /***/ },

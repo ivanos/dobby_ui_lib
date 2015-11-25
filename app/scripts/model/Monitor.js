@@ -2,8 +2,9 @@
 const TYPE_EVENT = 'event';
 const TYPE_RESPONSE = 'response';
 
-const CREATE_EVENT = 'create';
-const DELETE_EVENT = 'delete';
+export const CREATE_EVENT = 'create';
+export const CHANGE_EVENT = 'create';
+export const DELETE_EVENT = 'delete';
 
 export default class DobbyMonitor {
 
@@ -30,13 +31,12 @@ export default class DobbyMonitor {
 
             ws.onmessage = ({ data }) => {
                 let json = JSON.parse(data);
-                if (json.type === TYPE_EVENT && json.event === CREATE_EVENT) {
+                if (json.type === TYPE_EVENT) {
                     let identifier = json.message;
                     identifier.identifier = decodeURIComponent(identifier.identifier);
                     let callback = this.callbacks.get(identifier.identifier);
                     if (callback) {
-                        console.log(identifier);
-                        callback(identifier);
+                        callback(json.event, identifier);
                     }
                 }
             }

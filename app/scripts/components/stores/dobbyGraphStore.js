@@ -5,7 +5,7 @@ import Identifier from '../../model/Identifier';
 
 import { setRootIdentifiers } from '../actions/application';
 
-import Monitor from '../../model/Monitor';
+import Monitor, { DELETE_EVENT, CHANGE_EVENT } from '../../model/Monitor';
 
 
 export const PANEL_SEARCH = Symbol("PANEL_SEARCH");
@@ -95,12 +95,20 @@ export const globalStore = Reflux.createStore({
     },
 
     _startMonitoring(identifiers) {
-        this.monitor.listen(identifiers.map(i => i.name), i => {
+        this.monitor.listen(identifiers.map(i => i.name), (event, i) => {
             let identifier = Identifier.get(i.identifier);
             identifier.metadata = i.metadata;
 
-            //this.onMetadataUpdate(identifier, i.metadata);
-            this.onIdentifierDelete(identifier);
+            switch (event) {
+                case CHANGE_EVENT:
+                    this.onMetadataUpdate(identifier, i.metadata);
+                    break;
+                case DELETE_EVENT:
+                    this.onIdentifierDelete(identifier);
+                    break;
+                default:
+                    console.warn("Undefined monitor event");
+            }
         });
     },
 
