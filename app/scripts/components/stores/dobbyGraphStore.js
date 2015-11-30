@@ -85,6 +85,9 @@ export const globalStore = Reflux.createStore({
             edges: new Set(edges),
             nodes
         };
+
+        identifier.name = "IDENTIFIER WAS DELETED";
+
         storeDataUpdated(this.state);
 
         this._stopMonitoring([identifier]);
@@ -165,7 +168,9 @@ export const panelStore = Reflux.createStore({
     init() {
         this.state = this.getInitialState();
         this.listenTo(storeUpdated, this.onStoreSearchUpdated);
-        this.listenTo(storeDataUpdated, () => {
+        this.listenTo(storeDataUpdated, (state) => {
+            console.log("!!!!!!", state, this.state);
+
             this.trigger(this.state);
         });
 
