@@ -23,6 +23,8 @@ import ReactDOM from "react-dom";
 import { graphStore, searchGraph } from '../stores/dobbyGraphStore';
 import graphViewStore from '../stores/graphView';
 
+import { setPanelViewRoots } from '../actions/application';
+
 
 var GraphView = React.createClass({
 
@@ -101,7 +103,8 @@ var GraphView = React.createClass({
     _onPanelView() {
         var identifier = this.state.searchIdentifier;
         hideSearchMenu();
-        setView(COLUMN_VIEW, [identifier]);
+        setView(COLUMN_VIEW);
+        setPanelViewRoots([identifier]);
     },
 
     _overNode(_, identifier) {
@@ -113,8 +116,8 @@ var GraphView = React.createClass({
     },
 
     _updateGraph(graph) {
-        graph.addNodes(this.state.nodes);
-        graph.addEdges(this.state.edges);
+        graph.setNodes(this.state.nodes);
+        graph.setEdges(this.state.edges);
     },
 
     _highlightGraph(graph) {

@@ -16,8 +16,7 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentView: mainViewStore.getInitialState().currentView,
-            panelViewRoots: this.props.identifiers
+            currentView: mainViewStore.getInitialState().currentView
         };
     }
 
@@ -44,8 +43,6 @@ class Main extends React.Component {
                 </div>
                 <div style={{flex: 1, display: this.state.currentView === COLUMN_VIEW ? "flex" : "none"}}>
                     <ColumnView
-                        key={this.state.panelViewRoots[0].name}
-                        identifiers={this.state.panelViewRoots}
                         onSearchResults={(res) => {
                             // TODO: get rid of this
                             this.refs.graph._onSearchSuccess(res);
@@ -63,13 +60,3 @@ class Main extends React.Component {
 
 
 export default Main;
-
-
-
-searchStore.listen(function(state) {
-    console.log("store says: ", state);
-});
-
-//searchAction("test");
-
-

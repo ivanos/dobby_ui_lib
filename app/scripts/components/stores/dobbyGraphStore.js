@@ -3,9 +3,9 @@
 import Reflux from "reflux";
 import Identifier from '../../model/Identifier';
 
-import { setRootIdentifiers } from '../actions/application';
+import { setRootIdentifiers, setPanelViewRoots } from '../actions/application';
 
-import Monitor from '../../model/Monitor';
+import Monitor, { DELETE_EVENT, CHANGE_EVENT } from '../../model/Monitor';
 
 
 export const PANEL_SEARCH = Symbol("PANEL_SEARCH");
@@ -72,10 +72,46 @@ export const globalStore = Reflux.createStore({
         storeUpdated(this.state, options, result);
     },
 
+    onIdentifierDelete(identifier) {
+        let nodes = this.state.nodes;
+        let edges = this.state.edges;
+
+        nodes.delete(identifier);
+        edges = [...edges].filter((edge) => {
+            return edge.source !== identifier && edge.target !== identifier
+        });
+
+        this.state = {
+            edges: new Set(edges),
+            nodes
+        };
+
+        identifier.name = "IDENTIFIER WAS DELETED";
+
+        storeDataUpdated(this.state);
+
+        this._stopMonitoring([identifier]);
+    },
+
+    _stopMonitoring(identifiers) {
+        console.warn("not implemented");
+    },
+
     _startMonitoring(identifiers) {
-        this.monitor.listen(identifiers.map(i => i.name), i => {
-            //Identifier.get(i.identifier);
-            //console.log("monitoring", i);
+        this.monitor.listen(identifiers.map(i => i.name), (event, i) => {
+            let identifier = Identifier.get(i.identifier);
+            identifier.metadata = i.metadata;
+
+            switch (event) {
+                case CHANGE_EVENT:
+                    this.onMetadataUpdate(identifier, i.metadata);
+                    break;
+                case DELETE_EVENT:
+                    this.onIdentifierDelete(identifier);
+                    break;
+                default:
+                    console.warn("Undefined monitor event");
+            }
         });
     },
 
@@ -117,24 +153,56 @@ export const graphStore = Reflux.createStore({
     },
 
     onStoreUpdated(state, options, results) {
+        //console.log(state);
         this.trigger(state);
     }
 });
 
 export const panelStore = Reflux.createStore({
+    state: {
+        items: []
+    },
+
     getInitialState() {
-        return {
-            items: []
-        }
+        return this.state;
     },
 
     init() {
         this.state = this.getInitialState();
         this.listenTo(storeUpdated, this.onStoreSearchUpdated);
-        this.listenTo(storeDataUpdated, () => {
-            this.trigger(this.state);
-        });
+        this.listenTo(setPanelViewRoots, this.onSetPanelViewRoots);
+        this.listenTo(setRootIdentifiers, this.onSetPanelViewRoots);
+        this.listenTo(storeDataUpdated, this.onStoreDataUpdated);
 
+    },
+
+    onStoreDataUpdated(state) {
+        let index = this.state.items
+            .findIndex(({identifier}) => !!identifier && !state.nodes.has(identifier));
+        let items = this.state.items.slice(0, index < 0 ? this.state.items.length : index)
+            .map(({identifier, neighbours}) => {
+                let newNeighbours = neighbours.filter(({identifier, link}) => state.nodes.has(identifier));
+                return {
+                    identifier,
+                    neighbours: newNeighbours
+                }
+            });
+
+        this.state = {
+            items
+        };
+
+        this.trigger(this.state);
+    },
+
+    onSetPanelViewRoots(identifiers) {
+        this.state = {
+            items: [{
+                identifier: null,
+                neighbours: identifiers.map(identifier => ({identifier}))
+            }]
+        };
+        this.trigger(this.state)
     },
 
     onStoreSearchUpdated(state, options, results = null) {

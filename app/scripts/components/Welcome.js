@@ -1,40 +1,47 @@
+import React, { Component } from 'react';
 
 import Identifier from "../model/Identifier";
-import Component from "../Component";
 
-import $ from "jquery";
+import { Button, Field } from './Common';
+
+import { setRootIdentifiers, setScreen, MAIN_SCREEN } from './actions/application';
 
 class Welcome extends Component {
-    constructor() {
-        super($("[welcome]"));
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            names: 'PH4/VH1/OFS1'
+        }
     }
 
-    init() {
-        super.init();
+    render() {
+        return (
+            <div className="card">
+                <h1>Dobby</h1>
+                <p>Graph Visualizer Tool</p>
+                <Field
+                    type="text"
+                    placeholder="Identifier name"
+                    onChange={(e) => this.setState({names: e.target.value})}
+                    value={this.state.names}
+                />
+                <Button title="Select" onClick={() => this.onIdentifierSelect()} />
+            </div>
 
-        this.$error = this.find("[invalid-message]");
-        this.$find = this.find("form");
-
-        this.$error.hide();
-        this.$find.on("submit", (event) => {
-
-            this.$error.hide();
-
-            var identifierName = this.find("input").val();
-            this.findIdentifiers(identifierName.split(" "));
-            event.preventDefault();
-        });
+        );
     }
 
-    findIdentifiers(names) {
-        Promise.all(names.map((name) => {
+    onIdentifierSelect(names) {
+        Promise.all(this.state.names.split(' ').map((name) => {
             return Identifier.find(name)
                 .catch(() => Promise.resolve());
         })).then((identifiers) => {
-                $(this).trigger("root-identifiers", identifiers.filter((i) => i));
+                setRootIdentifiers(identifiers);
+                setScreen(MAIN_SCREEN);
             }, (error) => {
-                this.$error.show();
-                this.$error.text(error);
+                //this.$error.show();
+                //this.$error.text(error);
             });
     }
 }

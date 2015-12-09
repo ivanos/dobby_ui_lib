@@ -1,5 +1,5 @@
 import AddableFieldsPair from "./AddableFieldsPair";
-import {Button, Field} from "../Common/Common";
+import {Button, Field} from "../Common";
 
 import React from "react";
 
