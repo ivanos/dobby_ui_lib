@@ -1,4 +1,4 @@
-import { Button } from "./Common/Common";
+import { Button } from "./Common";
 import { setScreen, WELCOME_SCREEN, MAIN_SCREEN } from "./actions/application";
 import { setTheme, THEME_DARK, THEME_LIGHT} from "./actions/theme";
 import appStateStore from "./stores/application";

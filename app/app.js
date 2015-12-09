@@ -5,7 +5,7 @@ import './app.scss';
 
 
 import $ from "jquery";
-import React from "react";
+import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
 
@@ -15,7 +15,20 @@ import Identifier from "./scripts/model/Identifier";
 import Link from "./scripts/model/Link";
 import Header from "./scripts/components/Header";
 import appStateStore from "./scripts/components/stores/application";
-import { setRootIdentifiers, setScreen, MAIN_SCREEN, WELCOME_SCREEN } from "./scripts/components/actions/application";
+import { MAIN_SCREEN } from "./scripts/components/actions/application";
+
+
+class Application extends Component {
+    render() {
+        return (
+            <div>
+                <Header />
+                <Main />
+                <Welcome />
+            </div>
+        );
+    }
+}
 
 $(() => {
 
@@ -35,22 +48,19 @@ class App {
     startup() {
 
         ReactDOM.render(<Header />, $('.viewport > .header-container').get(0));
+        ReactDOM.render(<Welcome />, $('.container').get(0));
 
-        this.welcome.show();
+
+        //this.welcome.show();
 
         var renderMain = () => {
-            this.welcome.hide(() => {
-                $("[main]").show();
-                ReactDOM.render(<Main />, $("[main].container").get(0));
-            });
+            ReactDOM.render(<Main />, $(".container").get(0));
         };
 
         var renderWelcome = () => {
             Link.clear();
             Identifier.clear();
-            $("[main]").hide();
-            ReactDOM.render(<div />, $("[main].container").get(0));
-            this.welcome.show();
+            ReactDOM.render(<Welcome />, $('.container').get(0));
         };
 
         appStateStore.listen(({screen}) => {
@@ -60,15 +70,6 @@ class App {
                 renderWelcome();
             }
         });
-
-        $(this.welcome).on("root-identifiers", (event, ...identifiers) => {
-            setRootIdentifiers(identifiers);
-            setScreen(MAIN_SCREEN);
-        });
-
-        //$("[main] .clear-identifier").on("click", () => {
-        //
-        //});
     }
 }
 
