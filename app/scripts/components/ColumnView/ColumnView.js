@@ -12,9 +12,8 @@ import { identifierSelect, panelStore } from '../stores/dobbyGraphStore';
 var ColumnView = React.createClass({
 
     getInitialState() {
-        let panelStoreInitialState = panelStore.getInitialState();
         return {
-            ...panelStoreInitialState,
+            ...panelStore.getInitialState(),
             isLinksVisible: panelViewStore.getInitialState().isLinksVisible
         }
     },
@@ -38,13 +37,32 @@ var ColumnView = React.createClass({
         this.unPanelStore();
     },
 
-    _identifierSelect(identifier, index=0) {
+    _identifierSelect(identifier, index=1) {
         this.props.onIdentifierSelected(identifier);
         identifierSelect(identifier, index);
     },
 
     render() {
         var columns = this.state.items.map((item, index, items) => {
+
+            if (item.identifier === null) {
+                let identifierColumnClassName = ["identifier-column"];
+                if (this.state.items.length === 1) {
+                    identifierColumnClassName.push("last-column");
+                }
+                identifierColumnClassName = identifierColumnClassName.join(" ");
+
+                return (
+                    <IdentifierColumn
+                        ref="root"
+                        className={identifierColumnClassName}
+                        items={item.identifiers}
+                        onSelect={(identifier) => {this._identifierSelect(identifier)}}
+                        onHover={(identifier) => {this.refs.breadcrumbs.hover(identifier)}}
+                    />
+                )
+            }
+
             let columnClassName = index === items.length - 2 ? ["last-column"] : [];
 
             if (this.state.isLinksVisible) {
@@ -70,31 +88,18 @@ var ColumnView = React.createClass({
 
         });
 
-        var identifierColumnClassName = ["identifier-column"];
-        if (this.state.items.length === 1) {
-            identifierColumnClassName.push("last-column");
-        }
-        identifierColumnClassName = identifierColumnClassName.join(" ");
-
         return (
             <div className="column-list-component">
                 <div ref="scroll" className="columns-scroll">
                     <div className="columns-container">
-                        <IdentifierColumn
-                            ref="root"
-                            className={identifierColumnClassName}
-                            items={this.props.identifiers}
-                            onSelect={(identifier) => {this._identifierSelect(identifier)}}
-                            onHover={(identifier) => {this.refs.breadcrumbs.hover(identifier)}}
-                        />
                         {columns}
                     </div>
                 </div>
                 <BreadCrumbs
                     ref="breadcrumbs"
-                    items={this.state.items.map(({identifier}) => identifier)}
+                    items={this.state.items.map(({identifier}) => identifier).filter(i => !!i)}
                     onSelect={(identifier, index) => {
-                        this._identifierSelect(identifier, index);
+                        this._identifierSelect(identifier, index + 1);
                         this.refs.breadcrumbs.select();
                     }}
                 />

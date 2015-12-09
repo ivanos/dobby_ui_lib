@@ -3,7 +3,7 @@
 import Reflux from "reflux";
 import Identifier from '../../model/Identifier';
 
-import { setRootIdentifiers } from '../actions/application';
+import { setRootIdentifiers, setPanelViewRoots } from '../actions/application';
 
 import Monitor, { DELETE_EVENT, CHANGE_EVENT } from '../../model/Monitor';
 
@@ -153,27 +153,41 @@ export const graphStore = Reflux.createStore({
     },
 
     onStoreUpdated(state, options, results) {
-        console.log(state);
+        //console.log(state);
         this.trigger(state);
     }
 });
 
 export const panelStore = Reflux.createStore({
+    state: {
+        items: []
+    },
+
     getInitialState() {
-        return {
-            items: []
-        }
+        return this.state;
     },
 
     init() {
         this.state = this.getInitialState();
         this.listenTo(storeUpdated, this.onStoreSearchUpdated);
+        this.listenTo(setPanelViewRoots, this.onSetPanelViewRoots);
+        this.listenTo(setRootIdentifiers, this.onSetPanelViewRoots);
         this.listenTo(storeDataUpdated, (state) => {
-            console.log("!!!!!!", state, this.state);
+            //console.log("!!!!!!", state, this.state);
 
             this.trigger(this.state);
         });
 
+    },
+
+    onSetPanelViewRoots(identifiers) {
+        this.state = {
+            items: [{
+                identifier: null,
+                identifiers
+            }]
+        };
+        this.trigger(this.state)
     },
 
     onStoreSearchUpdated(state, options, results = null) {

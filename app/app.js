@@ -15,7 +15,7 @@ import Identifier from "./scripts/model/Identifier";
 import Link from "./scripts/model/Link";
 import Header from "./scripts/components/Header";
 import appStateStore from "./scripts/components/stores/application";
-import { setRootIdentifiers } from "./scripts/components/actions/application";
+import { setRootIdentifiers, setScreen, MAIN_SCREEN, WELCOME_SCREEN } from "./scripts/components/actions/application";
 
 $(() => {
 
@@ -38,15 +38,10 @@ class App {
 
         this.welcome.show();
 
-        var renderMain = (identifiers) => {
+        var renderMain = () => {
             this.welcome.hide(() => {
                 $("[main]").show();
-                ReactDOM.render(
-                    <Main
-                        identifiers={identifiers}
-                        />,
-                    $("[main].container").get(0)
-                );
+                ReactDOM.render(<Main />, $("[main].container").get(0));
             });
         };
 
@@ -58,9 +53,9 @@ class App {
             this.welcome.show();
         };
 
-        appStateStore.listen(({rootIdentifiers: identifiers}) => {
-            if (identifiers.length > 0) {
-                renderMain(identifiers);
+        appStateStore.listen(({screen}) => {
+            if (screen === MAIN_SCREEN) {
+                renderMain();
             } else {
                 renderWelcome();
             }
@@ -68,6 +63,7 @@ class App {
 
         $(this.welcome).on("root-identifiers", (event, ...identifiers) => {
             setRootIdentifiers(identifiers);
+            setScreen(MAIN_SCREEN);
         });
 
         //$("[main] .clear-identifier").on("click", () => {

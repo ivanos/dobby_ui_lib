@@ -101,7 +101,8 @@ var GraphView = React.createClass({
     _onPanelView() {
         var identifier = this.state.searchIdentifier;
         hideSearchMenu();
-        setView(COLUMN_VIEW, [identifier]);
+        setView(COLUMN_VIEW);
+        setPanelViewRoots([identifier]);
     },
 
     _overNode(_, identifier) {

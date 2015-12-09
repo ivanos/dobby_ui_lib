@@ -1,20 +1,20 @@
-import {setRootIdentifiers} from "../actions/application";
+import { setScreen, WELCOME_SCREEN } from "../actions/application";
 
 import Reflux from "reflux";
 
 var appStateStore = Reflux.createStore({
     init() {
-        this.listenTo(setRootIdentifiers, this.onSetRootIdentifiers);
+        this.listenTo(setScreen, this.onSetScreen);
     },
 
     getInitialState() {
         return {
-            rootIdentifiers: []
+            screen: WELCOME_SCREEN
         }
     },
 
-    onSetRootIdentifiers(rootIdentifiers) {
-        this.trigger({rootIdentifiers});
+    onSetScreen(screen) {
+        this.trigger({screen: screen});
     }
 
 });

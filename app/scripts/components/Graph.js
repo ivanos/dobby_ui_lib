@@ -52,7 +52,7 @@ class Graph extends Component {
         let newEdges = [...edges].filter(({data}) => !this.edgesMap.has(data));
         let edgesToRemove = [...this.edgesMap.keys()].filter(edge => !links.has(edge));
 
-        console.log(edges, newEdges, edgesToRemove);
+        //console.log(edges, newEdges, edgesToRemove);
 
         newEdges.forEach(({source, target, data}) => {
             var edge = this.createEdge(source, target, data);

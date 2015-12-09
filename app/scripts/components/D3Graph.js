@@ -195,7 +195,7 @@ class D3Graph extends Graph {
                 //.attr("fill", "#FFF")
                 .attr("rx", function(d, i) {
                     var {width} = this.parentNode.getBBox();
-                    console.log(this);
+                    //console.log(this);
                     return width/2 + 15
                 })
                 .attr("ry", 25);

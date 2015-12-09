@@ -54,7 +54,6 @@ class Identifier {
         if (match_terminal && match_terminal.length > 0) {params.match_terminal = match_terminal}
 
         return POST(`/identifier/${encodeURIComponent(this.name)}/search`, params)
-            .then((res) => {console.log(res); return res;})
             .then((res) => {
                 return {
                     links: res.links.map(createLink),

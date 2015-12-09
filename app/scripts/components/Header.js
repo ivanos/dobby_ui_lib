@@ -1,7 +1,7 @@
 import { Button } from "./Common/Common";
-import { setRootIdentifiers } from "./actions/application";
+import { setScreen, WELCOME_SCREEN, MAIN_SCREEN } from "./actions/application";
 import { setTheme, THEME_DARK, THEME_LIGHT} from "./actions/theme";
-import applicationStore from "./stores/application";
+import appStateStore from "./stores/application";
 import themeStore from "./stores/theme";
 import graphTransformStore from "./stores/graphTransform";
 import { zoomFit } from "./actions/graphTransform";
@@ -41,8 +41,8 @@ var Header = React.createClass({
     },
 
     componentDidMount() {
-        this.unApplicationStore = applicationStore.listen(({rootIdentifiers}) => {
-            this.setState({appInitialised: rootIdentifiers.length > 0});
+        this.unApplicationStore = appStateStore.listen(({screen}) => {
+            this.setState({appInitialised: screen == MAIN_SCREEN});
         });
 
         this.unThemeStore = themeStore.listen(state => this.setState(state));
@@ -102,7 +102,7 @@ var Header = React.createClass({
             controls.push(
                 <div>
                     <Button
-                        onClick={() => setRootIdentifiers([])}
+                        onClick={() => setScreen(WELCOME_SCREEN)}
                         title="Clear"
                     />
                 </div>,
