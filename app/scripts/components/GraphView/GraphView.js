@@ -23,6 +23,8 @@ import ReactDOM from "react-dom";
 import { graphStore, searchGraph } from '../stores/dobbyGraphStore';
 import graphViewStore from '../stores/graphView';
 
+import { setPanelViewRoots } from '../actions/application';
+
 
 var GraphView = React.createClass({
 

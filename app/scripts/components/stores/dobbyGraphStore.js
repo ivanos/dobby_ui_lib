@@ -172,19 +172,34 @@ export const panelStore = Reflux.createStore({
         this.listenTo(storeUpdated, this.onStoreSearchUpdated);
         this.listenTo(setPanelViewRoots, this.onSetPanelViewRoots);
         this.listenTo(setRootIdentifiers, this.onSetPanelViewRoots);
-        this.listenTo(storeDataUpdated, (state) => {
-            //console.log("!!!!!!", state, this.state);
+        this.listenTo(storeDataUpdated, this.onStoreDataUpdated);
 
-            this.trigger(this.state);
-        });
+    },
 
+    onStoreDataUpdated(state) {
+        let index = this.state.items
+            .findIndex(({identifier}) => !!identifier && !state.nodes.has(identifier));
+        let items = this.state.items.slice(0, index < 0 ? this.state.items.length : index)
+            .map(({identifier, neighbours}) => {
+                let newNeighbours = neighbours.filter(({identifier, link}) => state.nodes.has(identifier));
+                return {
+                    identifier,
+                    neighbours: newNeighbours
+                }
+            });
+
+        this.state = {
+            items
+        };
+
+        this.trigger(this.state);
     },
 
     onSetPanelViewRoots(identifiers) {
         this.state = {
             items: [{
                 identifier: null,
-                identifiers
+                neighbours: identifiers.map(identifier => ({identifier}))
             }]
         };
         this.trigger(this.state)

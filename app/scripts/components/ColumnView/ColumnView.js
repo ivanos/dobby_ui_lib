@@ -24,10 +24,13 @@ var ColumnView = React.createClass({
         });
 
         this.unPanelStore = panelStore.listen(state => {
+            let needsScroll = this.state.items.length !== state.items.length
             this.setState(state);
 
-            var $scroll = $(ReactDOM.findDOMNode(this.refs.scroll));
-            $scroll.animate({scrollLeft: $scroll.prop("scrollWidth")}, 500);
+            if (needsScroll) {
+                var $scroll = $(ReactDOM.findDOMNode(this.refs.scroll));
+                $scroll.animate({scrollLeft: $scroll.prop("scrollWidth")}, 500);
+            }
 
         });
     },
@@ -56,7 +59,7 @@ var ColumnView = React.createClass({
                     <IdentifierColumn
                         ref="root"
                         className={identifierColumnClassName}
-                        items={item.identifiers}
+                        items={item.neighbours.map(({identifier}) => identifier)}
                         onSelect={(identifier) => {this._identifierSelect(identifier)}}
                         onHover={(identifier) => {this.refs.breadcrumbs.hover(identifier)}}
                     />
