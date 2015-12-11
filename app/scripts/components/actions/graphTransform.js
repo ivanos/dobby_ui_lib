@@ -1,11 +1,5 @@
 import Reflux from "reflux";
 
-var autoTransform = Reflux.createAction();
-var userTransform = Reflux.createAction();
-var zoomFit = Reflux.createAction();
-
-export default {
-    autoTransform,
-    userTransform,
-    zoomFit
-}
+export const autoTransform = Reflux.createAction();
+export const userTransform = Reflux.createAction();
+export const zoomFit = Reflux.createAction();

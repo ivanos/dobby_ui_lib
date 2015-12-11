@@ -1,3 +1,4 @@
 import Reflux from "reflux";
 
-export default Reflux.createActions(["hideLinkColumn", "showLinkColumn"]);
+export const hideLinkColumn = Reflux.createAction();
+export const showLinkColumn = Reflux.createAction();

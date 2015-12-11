@@ -75,6 +75,7 @@ var SearchMenu = React.createClass({
         var fields = fieldPairs.map(({paramsKey, name}) => {
             return (
                 <AddableFieldsPair
+                    key={paramsKey}
                     fields={this.state.params[paramsKey]}
                     addField={() => this._addField(paramsKey)}
                     removeField={(index) => this._removeField(paramsKey, index)}

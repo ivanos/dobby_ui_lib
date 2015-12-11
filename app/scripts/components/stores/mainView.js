@@ -1,9 +1,6 @@
-import {setView} from "../actions/mainView";
-
 import Reflux from "reflux";
 
-const GRAPH_VIEW = Symbol("graph view");
-const COLUMN_VIEW = Symbol("column view");
+import setView, { GRAPH_VIEW, COLUMN_VIEW } from "../actions/mainView";
 
 var mainViewStore = Reflux.createStore({
     init() {
@@ -25,10 +22,5 @@ var mainViewStore = Reflux.createStore({
         this.trigger(state);
     }
 });
-
-export {
-    GRAPH_VIEW,
-    COLUMN_VIEW
-}
 
 export default mainViewStore;

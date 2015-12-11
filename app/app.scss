@@ -1,4 +1,4 @@
-body {
+.application {
     & {
         @import 'styles/colors';
         @import "styles/components/components.scss";

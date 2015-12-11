@@ -1,3 +1,4 @@
 import Reflux from "reflux";
 
-export default Reflux.createActions(["hideGraphLinks", "showGraphLinks"]);
+export const hideGraphLinks = Reflux.createAction();
+export const showGraphLinks = Reflux.createAction();

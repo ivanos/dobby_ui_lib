@@ -1,15 +1,12 @@
-import Component from "../Component";
-import Graph from "./D3Graph";
+import React from "react";
 
 import ColumnView from "./ColumnView/ColumnView";
 import GraphView from "./GraphView/GraphView";
 
-import {setView} from "./actions/mainView";
-import mainViewStore, {GRAPH_VIEW, COLUMN_VIEW} from "./stores/mainView";
+import setView, { GRAPH_VIEW, COLUMN_VIEW } from "./actions/mainView";
+import mainViewStore from "./stores/mainView";
 
-import {searchAction, searchStore} from "./actions/search";
-
-import React from "react";
+import { searchAction, searchStore } from "./actions/search";
 
 class Main extends React.Component {
 
@@ -31,8 +28,8 @@ class Main extends React.Component {
     }
 
     render() {
-        var content = "View is not defined";
 
+        console.log(this.state);
         return (
             <div className="main-container">
                 <div style={{flex: 1, display: this.state.currentView === GRAPH_VIEW ? "flex" : "none"}}>

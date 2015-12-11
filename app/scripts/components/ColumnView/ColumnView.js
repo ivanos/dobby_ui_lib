@@ -57,6 +57,7 @@ var ColumnView = React.createClass({
 
                 return (
                     <IdentifierColumn
+                        key="root"
                         ref="root"
                         className={identifierColumnClassName}
                         items={item.neighbours.map(({identifier}) => identifier)}

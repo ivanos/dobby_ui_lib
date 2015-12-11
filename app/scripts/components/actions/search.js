@@ -1,11 +1,11 @@
 import Reflux from "reflux";
 
-var searchAction = Reflux.createAction({
+export var searchAction = Reflux.createAction({
     asyncResult: true
 });
 
 
-var searchStore = Reflux.createStore({
+export var searchStore = Reflux.createStore({
     init() {
         this.listenTo(searchAction, this.onSearchAction);
         this.listenTo(searchAction.completed, this.onSearchActionCompleted);
@@ -22,6 +22,4 @@ var searchStore = Reflux.createStore({
     }
 
 });
-
-export default {searchAction, searchStore};
 

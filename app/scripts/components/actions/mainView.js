@@ -1,7 +1,8 @@
 import Reflux from "reflux";
 
-var setView = Reflux.createAction();
+let setView = Reflux.createAction();
 
-export default {
-    setView
-}
+export const GRAPH_VIEW = Symbol("graph view");
+export const COLUMN_VIEW = Symbol("column view");
+
+export default setView;

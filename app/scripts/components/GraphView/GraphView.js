@@ -13,8 +13,7 @@ import zoomStore from "../stores/graphTransform";
 import searchMenuStore from "../stores/searchMenu";
 
 import {showSearchMenu, hideSearchMenu} from "../actions/searchMenu";
-import {setView} from "../actions/mainView";
-import {COLUMN_VIEW} from "../stores/mainView";
+import setView, {COLUMN_VIEW} from "../actions/mainView";
 
 import $ from "jquery";
 import React from "react";
