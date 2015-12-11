@@ -14,7 +14,6 @@ import { hideGraphLinks, showGraphLinks } from "./actions/graphView";
 import graphViewStore from "./stores/graphView";
 
 import $ from 'jquery';
-
 import React from "react";
 
 function toggleGraphLinks() {

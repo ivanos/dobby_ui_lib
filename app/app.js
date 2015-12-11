@@ -3,8 +3,6 @@ import 'babel-core/polyfill';
 import 'reset.css/reset.css';
 import './app.scss';
 
-
-import $ from "jquery";
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
@@ -19,57 +17,29 @@ import { MAIN_SCREEN } from "./scripts/components/actions/application";
 
 
 class Application extends Component {
+
+    state = {};
+
+    componentDidMount() {
+        this.unAppStateStore = appStateStore.listen(state => this.setState(state));
+    }
+
+    componentWillUnmount() {
+        this.unAppStateStore();
+    }
+
     render() {
+        let content = this.state.screen === MAIN_SCREEN ?
+            <Main /> :
+            <Welcome />;
+
         return (
-            <div>
-                <Header />
-                <Main />
-                <Welcome />
+            <div className="viewport">
+                <div className="header-container"><Header /></div>
+                <div className="container">{ content }</div>
             </div>
         );
     }
 }
 
-$(() => {
-
-    //$("[welcome]").hide();
-    //$("[main]").hide();
-
-    var app = new App();
-});
-
-
-class App {
-    constructor() {
-        this.welcome = new Welcome();
-        this.startup();
-    }
-
-    startup() {
-
-        ReactDOM.render(<Header />, $('.viewport > .header-container').get(0));
-        ReactDOM.render(<Welcome />, $('.container').get(0));
-
-
-        //this.welcome.show();
-
-        var renderMain = () => {
-            ReactDOM.render(<Main />, $(".container").get(0));
-        };
-
-        var renderWelcome = () => {
-            Link.clear();
-            Identifier.clear();
-            ReactDOM.render(<Welcome />, $('.container').get(0));
-        };
-
-        appStateStore.listen(({screen}) => {
-            if (screen === MAIN_SCREEN) {
-                renderMain();
-            } else {
-                renderWelcome();
-            }
-        });
-    }
-}
-
+ReactDOM.render(<Application />, document.getElementById('application'));
